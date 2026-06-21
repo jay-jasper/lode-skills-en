@@ -1,0 +1,25 @@
+{
+  "//": "Lodestar gate example. Merge this hooks block into the project's .claude/settings.json. The command paths point to the real location of this repo's hooks/.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/hooks/lode-signal.sh\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/hooks/lode-gate.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
