@@ -28,6 +28,7 @@ In solo mode, "completion" = local build + `review-passed`. **Team / long-lived 
 - Production build succeeds, producing a runnable artifact for the target platform.
 - Release notes written (version number, change summary, known limitations), sourced from `changelog.md`.
 - Acceptance/install instructions provided, so the user can get it running.
+- **Actively demo it running**: after packaging/building, run it yourself and screenshot, or give a "install like this, run like this" command — let the user see the finished product running, not just hand over a package.
 - **Team mode**: all PRs passed CI + approved and merged; the release is cut from mainline.
 
 ## Guardrails (red lines)

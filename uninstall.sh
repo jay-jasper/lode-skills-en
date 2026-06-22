@@ -23,7 +23,7 @@ try:
     if not isinstance(s, dict): raise ValueError
 except Exception:
     sys.exit(0)  # unparseable — leave it alone
-def ours(cmd): return "lode-hooks/lode-gate.sh" in cmd or "lode-hooks/lode-signal.sh" in cmd
+def ours(cmd): return "lode-hooks/lode-gate.sh" in cmd or "lode-hooks/lode-signal.sh" in cmd or "lode-hooks/lode-session.sh" in cmd
 hooks = s.get("hooks", {}); changed = False
 for event in list(hooks.keys()):
     groups = []

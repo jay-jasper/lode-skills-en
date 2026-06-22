@@ -1,6 +1,16 @@
 {
   "//": "Lodestar gate example. Merge this hooks block into the project's .claude/settings.json. The command paths point to the real location of this repo's hooks/.",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/hooks/lode-session.sh\""
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [

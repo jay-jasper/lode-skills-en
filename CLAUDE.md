@@ -28,6 +28,8 @@ The lean mainline is tuned for **solo · from scratch · the first version** (fr
 - **Safety/compliance-critical**: on top of the above, add mandatory security review + requirement-code-test traceability (see `lode-review`).
 
 > The principle is unchanged: capability is extended by **stacking guardrails per mode**, not by forcing one heavy process on everyone. From scratch stays light; changing existing code or team work brings the heavy guardrails. **Autonomous ≠ unattended**: the agent self-drives the whole way; the human shows up only at "review the PR" and "handle the breaker."
+>
+> **Scale the ceremony to the task size too**: for a ten-line change or a config tweak, a one-sentence spec, a single slice, and skipping brief/design are fine — the gate only bites once dev has started. Full guardrails are for big work / brownfield / teams. Don't push a long process onto a small change.
 
 ## [Task] Mainline flow + when to call which Skill
 
@@ -68,8 +70,9 @@ Runtime artifacts all land in `.lode/<project>/`: `product-spec.md → design-br
 ## Gate (deterministic judgments → made into a program, not good intentions)
 
 Enforced by `hooks/` (merged into `.claude/settings.json`):
-- **Stop hook `lode-gate.sh`**: iterates every workspace where dev has started (CHANGELOG exists); before wrap-up ① actually runs `.lode/<project>/verify.sh` (build+test, verdict by exit code; skipped via cache when the code fingerprint is unchanged) ② checks `review-passed` is non-empty AND contains the **current code fingerprint** (git repos use content-level diff; blocks "reviewed-then-edited", empty touch, faked markers); either layer failing hard-blocks. After ≥5 consecutive blocks a **breaker** trips: pass and hand to the human (blocks "expensive non-completion"). The gate **doesn't trust only the model-written flag** — build/test are actually run by a program.
+- **Stop hook `lode-gate.sh`**: iterates every workspace where dev has started (CHANGELOG exists); before wrap-up ① actually runs `.lode/<project>/verify.sh` (build+test, verdict by exit code; skipped via cache when the code fingerprint is unchanged) ② checks `review-passed` is non-empty AND contains the **current code fingerprint** (git repos use content-level diff; blocks "reviewed-then-edited", empty touch, faked markers); either layer failing hard-blocks. After ≥5 consecutive blocks a **breaker** trips: pass and hand to the human (blocks "expensive non-completion"). The gate **doesn't trust only the model-written flag** — build/test are actually run by a program. (Honestly: only ①build ②test + the anti-tamper fingerprint are hard-judged by the program; ③code review ④functional test remain **a clean brain's judgment** — the gate only guarantees "the marker isn't faked and code wasn't changed after review", not that "a real review happened".)
 - **UserPromptSubmit hook `lode-signal.sh`**: when a correction/dissatisfaction keyword hits, append the signal to `signals.jsonl` to feed self-evolution.
+- **SessionStart hook `lode-session.sh`**: at session start, checks the signal queue; if non-empty, prompts to run `lode-evolve` — making the self-evolution **trigger** a program, not the model's memory.
 
 Every slice must run the **four-step audit**, ordered "deterministic → judgment": `build verification → test completeness → Code Review → functional test`. The first two (deterministic) are handed to the `verify.sh` gate to actually run; the last two (uncertain) go to an independent subagent / human. All four pass → Done. **Test completeness is spec-bound**: it tests this slice's "acceptance scenarios" — **defined in plan before building** (derived from the acceptance criteria) — not weak tests the builder patches in after writing the code; this binds tests to the requirement, not the implementation, closing the "green tests but wrong feature" gap.
 
@@ -98,7 +101,7 @@ Principle: **two kinds of rules, don't conflate them**.
 - **Web-first**: for external APIs and framework versions, search to confirm before acting.
 - **Self-evolution**: a user correction is captured as a signal into `signals.jsonl`; `hooks/lode-signal.sh` (UserPromptSubmit) catches only the obvious by keyword, and the main agent backfills what the hook missed.
 - **Inside the Lodestar flow, prefer the `lode-*` series**: the environment has many synonymous skills installed (spec-driven-development, planning-and-task-breakdown, code-review…); each mainline step explicitly uses its corresponding `lode-*` to avoid auto-trigger being stolen by a synonymous skill.
-- At Session start the main agent self-checks: if `signals` is non-empty, spawn `lode-evolve` to digest into `proposals.md`.
+- At Session start `lode-session.sh` (SessionStart hook) checks `signals`; if non-empty it prompts, and the main agent spawns `lode-evolve` to digest into `proposals.md`.
 - **Docs are the single source of truth**: any change edits the corresponding upstream doc first, then the code; when an upstream doc changes, the main agent proactively updates downstream and keeps iteration in sync.
 
 ## [File Structure]

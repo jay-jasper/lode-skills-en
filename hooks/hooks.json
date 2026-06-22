@@ -1,6 +1,16 @@
 {
   "//": "Lodestar plugin gate. Active as soon as the plugin is enabled — no manual merge into .claude/settings.json needed. Script paths use ${CLAUDE_PLUGIN_ROOT} to point at the plugin's bundled hooks/. The gate scripts exit 0 when there is no .lode/ workspace, so enabling the plugin in non-Lodestar projects has no side effect.",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/lode-session.sh\""
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [
