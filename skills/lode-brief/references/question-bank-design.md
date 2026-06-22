@@ -1,6 +1,6 @@
 # Design Question Bank (Design) — starter template
 
-> Used by lode-brief. Lands at `.lode/<project>/question-bank-design.md`.
+> Used by lode-brief. Lands at `.lode/question-bank-design.md`.
 > Force "feel" into decisions: multiple-choice first, anti-reference mandatory, rejected → swap in a new batch.
 > Self-evolution only adds/changes/deletes here, each mapping to one real failure.
 

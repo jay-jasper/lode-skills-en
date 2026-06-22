@@ -1,11 +1,11 @@
 ---
 name: lode-spec
-description: "Lodestar mainline ① — requirements gathering. Pin down a fuzzy idea into a buildable product-spec. Use when the user is starting a new product/feature, changing or extending an existing project, gives only a one-line need or a vague idea, or needs requirements gathering — this is the unified requirements entry for both from scratch and changing existing code (changing existing code auto-fills system-map first, then runs as a delta). Blunt by default, no flattery, multiple-choice questioning. Trigger: /lode-spec"
+description: "Lodestar mainline ① — requirements gathering. Pin down a fuzzy idea into a buildable spec. Use when the user is starting a new product/feature, changing or extending an existing project, gives only a one-line need or a vague idea, or needs requirements gathering — this is the unified requirements entry for both from scratch and changing existing code (changing existing code auto-fills system-map first, then runs as a delta). Blunt by default, no flattery, multiple-choice questioning. Trigger: /lode-spec"
 ---
 
 # Product Spec Builder (Requirements Gathering)
 
-Mainline step ①, and where the "blunt" persona is most concentrated. Through a structured interview, pin down a fuzzy idea into a `product-spec.md` that can go straight to development.
+Mainline step ①, and where the "blunt" persona is most concentrated. Through a structured interview, pin down a fuzzy idea into a `docs/spec.md` that can go straight to development.
 
 ## Usage (when to use)
 
@@ -15,10 +15,11 @@ Mainline step ①, and where the "blunt" persona is most concentrated. Through a
 
 ## At the start: auto-provision what's needed (zero user judgment)
 
-On entering a project, **automatically** put the two things Lodestar's loop needs in place — don't make the user decide "when to install" anything:
+On entering a project, **automatically** put what Lodestar's loop needs in place — don't make the user decide "when to install" anything:
 
 1. **Rules `CLAUDE.md`**: if the project root doesn't have it, **tell the user once, then drop a copy** — source: plugin install `${CLAUDE_PLUGIN_ROOT}/CLAUDE.md`, script install `~/.claude/lodestar/CLAUDE.md` (if neither is found, ask where Lodestar is installed). **If a `CLAUDE.md` already exists at the project root, never touch it** — it's likely the user's own project rules: don't overwrite, don't silently edit. Tell the user "you already have a CLAUDE.md," and only with their OK append Lodestar's rules in a `<!-- LODESTAR:BEGIN/END -->` block (removable as one block); without consent leave it as-is and let the skills + gate carry this session. **Note**: a project `CLAUDE.md` is usually loaded at session start, so one dropped mid-session takes full effect **next session**; this session's meta-rules are carried by the skill bodies + the gate — after dropping it, tell the user "rules are in place; fully active from your next session."
 2. **Current-state map `system-map.md`**: per the table below. (`verify.sh` is NOT provisioned here — `lode-build` writes it from the real build/test commands the moment development actually starts.)
+3. **Requirements doc `docs/spec.md`**: if one exists, **read it in and edit on top of it** (never rewrite wholesale); only create it when none exists. And ensure the project `.gitignore` **ignores `.lode/` and tracks `docs/spec*.md`** (the spec is a committed deliverable; `.lode/` is runtime, out of git).
 
 > All of this is **done automatically by the flow**, not a prerequisite command pushed on the user. To scaffold manually in one shot, the optional `/lode-init` exists (rarely needed).
 
@@ -36,7 +37,7 @@ On entering a project, **automatically** put the two things Lodestar's loop need
 
 ## How to ask (thin on steps, thick on standards)
 
-Don't write a "ask this first, ask that second" script. What you write thick is a **question bank** (lands at `.lode/<project>/question-bank-spec.md`; starter template in this skill's `references/question-bank-spec.md`): each question carries "what answer is acceptable / what answer must be pushed back." The model dynamically decides the next question from the user's answers; the question bank only yanks it back when it drifts. Delete the "how-to"; thicken the "what counts as good."
+Don't write a "ask this first, ask that second" script. What you write thick is a **question bank** (lands at `.lode/question-bank-spec.md`; starter template in this skill's `references/question-bank-spec.md`): each question carries "what answer is acceptable / what answer must be pushed back." The model dynamically decides the next question from the user's answers; the question bank only yanks it back when it drifts. Delete the "how-to"; thicken the "what counts as good."
 
 Four techniques (the key to questioning efficiently):
 
@@ -57,10 +58,10 @@ For interface structure, layout, or screen-to-screen relationships that are **ha
   │  list   │ big image +   │   This "list-left + preview-right", or a top/bottom split?
   └─────────┴── timeline ───┘
   ```
-- **Needs a comparison / some realism to settle** → write a low-fi `.lode/<project>/wireframe.html` (static, double-click to open) and give `open .lode/<project>/wireframe.html`; the user looks and replies in the terminal.
+- **Needs a comparison / some realism to settle** → write a low-fi `.lode/wireframe.html` (static, double-click to open) and give `open .lode/wireframe.html`; the user looks and replies in the terminal.
 - **Needs truly high-fidelity / a clickable prototype** → that's the signal; don't force it in spec: go to `/lode-brief` → `/lode-design` (that's where openable, finished prototypes come from).
 
-> Before drawing for the first time, ask once on its own — "want me to sketch a wireframe?" — for consent, then decide **per point** (not every UI topic needs a picture). Record the agreed layout intent in `product-spec.md`'s "layout intent" (a wireframe can be attached). **Spec only disambiguates; it doesn't produce finished design.**
+> Before drawing for the first time, ask once on its own — "want me to sketch a wireframe?" — for consent, then decide **per point** (not every UI topic needs a picture). Record the agreed layout intent in `docs/spec.md`'s "layout intent" (a wireframe can be attached). **Spec only disambiguates; it doesn't produce finished design.**
 
 ## Surface assumptions (mandatory before acting)
 
@@ -84,7 +85,7 @@ When the goal lands in an existing project, the spec isn't "what to build" but *
 
 ## Done (what counts as acceptable)
 
-Produce `.lode/<project>/product-spec.md` that satisfies:
+Produce `docs/spec.md` that satisfies:
 - Value proposition + target user + core scenarios stated clearly.
 - Functional requirements layered (what this version does / what it defers), each acceptance-testable.
 - Explicit **scope boundary** (what it won't do) to prevent unbounded growth.
@@ -101,9 +102,10 @@ Produce `.lode/<project>/product-spec.md` that satisfies:
 - When UI/layout is hard to put in words, align with a quick wireframe — **don't produce finished design in spec** (that belongs to brief/design).
 - Describe **capabilities**, don't shred the requirement into a pile of fragmented little tools.
 - When the user corrects your judgment (e.g. you advised conservative and got overruled), capture it as a Signal into `signals.jsonl` for self-evolution.
+- **Read-before-write, evolve don't stack**: at the start read the existing `docs/spec.md` and edit on top of it; move superseded items to an "adjusted/deprecated" archive at the bottom — **don't rewrite wholesale, don't pile up increments**. Append one line per substantive change to `docs/spec-changelog.md` (date / what / why); full history goes to git.
 - Confirm with the user before moving to the next step.
 
 ## → Next
 Requirements set, pick one:
 - Want to drive each step → `/lode-plan` to split into slices (if the UI is make-or-break, `/lode-brief` first).
-- Want the agent to run the rest to completion → `/lode-auto` (it takes **this `product-spec.md` as input directly** to decompose the plan and build slice by slice — it won't re-ask for requirements).
+- Want the agent to run the rest to completion → `/lode-auto` (it takes **this `docs/spec.md` as input directly** to decompose the plan and build slice by slice — it won't re-ask for requirements).

@@ -5,8 +5,8 @@
 #            backfills what the hook missed (see CLAUDE.md).
 #
 # Behavior: read the UserPromptSubmit JSON from stdin, extract this turn's prompt text; if it hits a
-#       correction/dissatisfaction keyword, append a signal to the most-recently-active
-#       .lode/<project>/signals.jsonl. Never blocks user input (always exit 0).
+#       correction/dissatisfaction keyword, append a signal to
+#       .lode/signals.jsonl. Never blocks user input (always exit 0).
 set -euo pipefail
 
 cd "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null || true
@@ -29,10 +29,9 @@ KEYWORDS="that's not what|that is not what|don't do that|do not do that|stop doi
 
 printf '%s' "${PROMPT}" | grep -qiE "${KEYWORDS}" || exit 0
 
-# Find the most-recently-active lode workspace
-LODE_DIR=$(ls -dt .lode/*/ 2>/dev/null | head -1 || true)
-[ -z "${LODE_DIR}" ] && exit 0
-SIGNALS="${LODE_DIR}signals.jsonl"
+# Not a lode project (no .lode/) → don't record
+[ -d .lode ] || exit 0
+SIGNALS=".lode/signals.jsonl"
 
 TS=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "")
 

@@ -1,6 +1,6 @@
-# product-spec — <project/feature name>
+# spec — <project/feature name>
 
-> Produced by lode-spec. Lands at `.lode/<project>/product-spec.md`
+> Produced by lode-spec. Lands at `docs/spec.md`
 > Paired `question-bank-spec.md`: each interview question + "what answer is acceptable / what must be pushed back"; self-evolution only adds/changes here.
 
 ## Value Proposition

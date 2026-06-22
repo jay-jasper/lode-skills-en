@@ -35,7 +35,7 @@ The lean mainline is tuned for **solo · from scratch · the first version** (fr
 
 | Step | Stage | Skill | Output doc | When |
 |---|---|---|---|---|
-| 1 | Requirements gathering | `lode-spec` | `product-spec.md` | Must |
+| 1 | Requirements gathering | `lode-spec` | `docs/spec.md` | Must |
 | 2 | Design brief | `lode-brief` | `design-brief.md` | Optional |
 | 3 | Mockups | `lode-design` | mockups/prototypes | Optional |
 | 4 | Dev plan | `lode-plan` | `dev-plan.md` | Must |
@@ -63,14 +63,14 @@ To hand one goal to the agent to **run to completion autonomously**, use `lode-a
 
 ## Doc-driven + Session hygiene
 
-Runtime artifacts all land in `.lode/<project>/`: `product-spec.md → design-brief.md → dev-plan.md → code → changelog.md`.
+Requirements land in `docs/` (git-tracked); other working drafts land in `.lode/` (gitignored): `docs/spec.md → .lode/{design-brief,dev-plan} → code → .lode/changelog.md`.
 - The AI not losing context across steps **relies precisely on these docs** (fuller than memory). Read the previous step's doc before entering a new step.
 - **One Session develops one feature**; the next feature opens a new Session, keeping each Session's context small and clean and the model's attention always at its best.
 
 ## Gate (deterministic judgments → made into a program, not good intentions)
 
 Enforced by `hooks/` (merged into `.claude/settings.json`):
-- **Stop hook `lode-gate.sh`**: iterates every workspace where dev has started (CHANGELOG exists); before wrap-up ① actually runs `.lode/<project>/verify.sh` (build+test, verdict by exit code; skipped via cache when the code fingerprint is unchanged) ② checks `review-passed` is non-empty AND contains the **current code fingerprint** (git repos use content-level diff; blocks "reviewed-then-edited", empty touch, faked markers); either layer failing hard-blocks. After ≥5 consecutive blocks a **breaker** trips: pass and hand to the human (blocks "expensive non-completion"). The gate **doesn't trust only the model-written flag** — build/test are actually run by a program. (Honestly: only ①build ②test + the anti-tamper fingerprint are hard-judged by the program; ③code review ④functional test remain **a clean brain's judgment** — the gate only guarantees "the marker isn't faked and code wasn't changed after review", not that "a real review happened".)
+- **Stop hook `lode-gate.sh`**: iterates every workspace where dev has started (CHANGELOG exists); before wrap-up ① actually runs `.lode/verify.sh` (build+test, verdict by exit code; skipped via cache when the code fingerprint is unchanged) ② checks `review-passed` is non-empty AND contains the **current code fingerprint** (git repos use content-level diff; blocks "reviewed-then-edited", empty touch, faked markers); either layer failing hard-blocks. After ≥5 consecutive blocks a **breaker** trips: pass and hand to the human (blocks "expensive non-completion"). The gate **doesn't trust only the model-written flag** — build/test are actually run by a program. (Honestly: only ①build ②test + the anti-tamper fingerprint are hard-judged by the program; ③code review ④functional test remain **a clean brain's judgment** — the gate only guarantees "the marker isn't faked and code wasn't changed after review", not that "a real review happened".)
 - **UserPromptSubmit hook `lode-signal.sh`**: when a correction/dissatisfaction keyword hits, append the signal to `signals.jsonl` to feed self-evolution.
 - **SessionStart hook `lode-session.sh`**: at session start, checks the signal queue; if non-empty, prompts to run `lode-evolve` — making the self-evolution **trigger** a program, not the model's memory.
 
@@ -85,7 +85,7 @@ Every slice must run the **four-step audit**, ordered "deterministic → judgmen
 ## Self-Evolution mechanism
 
 ```
-You correct it / chew it out  →  written to .lode/<project>/signals.jsonl (signal queue)
+You correct it / chew it out  →  written to .lode/signals.jsonl (signal queue)
    →  next new Session, during the light self-check (docs/code/signal queue), fan out the lode-evolve subagent to digest
    →  abstract into rule proposals in proposals.md, decide each: replace / supplement / new
    →  you confirm (add/change/delete)  →  land into the relevant Skill's question-bank-*.md or this rule base
@@ -104,28 +104,34 @@ Principle: **two kinds of rules, don't conflate them**.
 - **Inside the Lodestar flow, prefer the `lode-*` series**: the environment has many synonymous skills installed (spec-driven-development, planning-and-task-breakdown, code-review…); each mainline step explicitly uses its corresponding `lode-*` to avoid auto-trigger being stolen by a synonymous skill.
 - At Session start `lode-session.sh` (SessionStart hook) checks `signals`; if non-empty it prompts, and the main agent spawns `lode-evolve` to digest into `proposals.md`.
 - **Docs are the single source of truth**: any change edits the corresponding upstream doc first, then the code; when an upstream doc changes, the main agent proactively updates downstream and keeps iteration in sync.
+- **Write requirement drift back to spec on the spot**: any requirement/scope change — whether it surfaces in `/lode-spec`, mid-build, in ad-hoc discussion, or from your correction — is **written back to `docs/spec.md` immediately** (update the current truth in place) plus one line in `docs/spec-changelog.md` (date / what / why); don't just implement it in code and move on. **The spec must always equal "what we're actually building now," never lag the code.**
+- **The spec only evolves, never stacks**: `docs/spec.md` always updates in place to stay the current truth; superseded items move to an archive at the bottom rather than piling up; full history goes to git and the thin `spec-changelog.md` — don't let the spec you read daily get bloated by increments.
 
 ## [File Structure]
 
 ```
 project/
-├── .lode/<project>/                 # runtime artifacts (per feature)
-│   ├── system-map.md                # living current-state map (every project: built by spec, kept current by build)
-│   ├── product-spec.md / product-spec-changelog.md   # requirements doc + change log
-│   ├── design-brief.md              # design brief (optional)
-│   ├── dev-plan.md                  # phased dev plan
-│   ├── changelog.md                 # per-slice change log
-│   ├── verify.sh                    # deterministic build+test (run by the gate)
+├── docs/                            # committed deliverable docs (tracked in git)
+│   ├── spec.md                      # requirements: the one durable source of truth (evolves in place, archives old items, stays bounded)
+│   └── spec-changelog.md            # requirements change log (one line per change, with date)
+├── .lode/                           # runtime / working drafts (entirely gitignored)
+│   ├── system-map.md                # living current-state map (built by spec, kept current by build; regenerable)
+│   ├── design-brief.md / mockups/   # design artifacts (optional; new design supersedes old in place)
+│   ├── dev-plan.md                  # dev plan (cycle draft, cleaned after release)
+│   ├── changelog.md                 # per-slice changes (with timestamps; cycle draft, cleaned after release)
+│   ├── verify.sh                    # deterministic build+test (run by the gate; regenerable)
+│   ├── goal.md / ledger.jsonl       # autopilot: goal + progress ledger
 │   ├── signals.jsonl / proposals.md # self-evolution: signal queue + proposals
-│   └── review-passed                # review-passed marker
-├── <project-name>/                  # project code (named after the project)
+│   └── review-passed / .verify-green / .gate-attempts  # gate bookkeeping (regenerated each time)
+├── <code-dir>/                      # project code
 ├── CLAUDE.md                        # top-level control rules (this file)
-├── conventions.md                   # general writing & coding conventions (or reuse ECC rules)
 └── .claude/
     ├── skills/lode-*/               # per-stage capability modules (SKILL.md + references/)
     ├── agents/                      # lode-review, lode-evolve, lode-recon subagents
     └── settings.json                # model / MCP / hooks (deterministic gate)
 ```
+
+> **The split principle**: `docs/spec.md` + `docs/spec-changelog.md` are the **durable, git-tracked** source of truth; everything in `.lode/` is working state — either consumed within a cycle (dev-plan/changelog/design), regenerable (system-map/verify), or pure bookkeeping (ledger/signals/review-passed/cache). The project `.gitignore` should ignore `.lode/` and track `docs/spec*.md`.
 
 <!-- RULES:BEGIN — each line: - [source Signal] rule. -->
 <!-- RULES:END -->

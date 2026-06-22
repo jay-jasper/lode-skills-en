@@ -15,7 +15,7 @@ Extension skill · completion gate. This is the paradigm's **canonical case for 
 
 ## How to run it (orchestration)
 
-The main agent **fans out a clean-head subagent**: use the `Agent` tool to invoke the `lode-review` subagent (see `agents/lode-review.md`), carrying **the full relevant context** (the change diff, that slice's order, product-spec/dev-plan excerpts). The subagent returns only a conclusion; **the main agent merges and decides**.
+The main agent **fans out a clean-head subagent**: use the `Agent` tool to invoke the `lode-review` subagent (see `agents/lode-review.md`), carrying **the full relevant context** (the change diff, that slice's order, spec/dev-plan excerpts). The subagent returns only a conclusion; **the main agent merges and decides**.
 
 ## Done (what counts as acceptable)
 
@@ -24,7 +24,7 @@ Return a structured review report covering the **four-step audit**: build verifi
 - **Test completeness is checked spec-bound**: every "acceptance scenario" of this slice has a corresponding test, and the tests test the requirement, not the implementation; the functional test **runs each acceptance scenario** — "tests exist and are green" is not a pass.
 - Each issue graded by severity: CRITICAL / HIGH / MEDIUM / LOW.
 - A clear verdict: **pass / fail** (any CRITICAL = fail).
-- On pass, the **main agent** writes the conclusion into `.lode/<project>/review-passed` (note the reviewed slice/commit, plus a line `tree: <current code fingerprint>` — get it via `lode-gate.sh fingerprint`). The gate lets it through on that basis, and verifies the fingerprint matches current code: **edit-after-review invalidates the marker and requires a re-review**.
+- On pass, the **main agent** writes the conclusion into `.lode/review-passed` (note the reviewed slice/commit, plus a line `tree: <current code fingerprint>` — get it via `lode-gate.sh fingerprint`). The gate lets it through on that basis, and verifies the fingerprint matches current code: **edit-after-review invalidates the marker and requires a re-review**.
 - On fail, each blocking item states "why + how to fix"; the main agent fixes and runs another round until Pass.
 
 **Changing existing code / team / safety-critical extra review:**
@@ -37,5 +37,5 @@ Return a structured review report covering the **four-step audit**: build verifi
 
 - The review subagent **reviews only, doesn't change code**; fixes go back to `lode-build` / `lode-fix`.
 - Review not passed → wrap-up not allowed (enforced by the Stop hook gate, not by good intentions).
-- Review scope aligns to the order and product-spec; don't expand the requirement under cover of review.
+- Review scope aligns to the order and spec; don't expand the requirement under cover of review.
 - Decision authority stays with the main agent / human; the subagent doesn't decide the release for you.

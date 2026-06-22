@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deterministic verification script — laid down by lode-init / lode-build to .lode/<project>/verify.sh.
+# Deterministic verification script — laid down by lode-init / lode-build to .lode/verify.sh.
 # Purpose: wrap this project's "build + full regression tests" into one command, all pass => exit 0, any failure => non-zero.
 # The Stop gate lode-gate.sh actually runs it — "did build/test pass" is a deterministic judgment, handed
 # to a program, not the model's verbal self-assessment.
@@ -8,7 +8,7 @@
 # Changing existing code: MUST run [the full existing suite + new tests], and compare against the pre-change baseline —
 #             to tell "what you broke" from "what was already broken."
 #             Save the baseline once before touching anything:
-#             `bash verify.sh > .lode/<project>/baseline.md 2>&1 || true`
+#             `bash verify.sh > .lode/baseline.md 2>&1 || true`
 set -euo pipefail
 
 # ── Unconfigured guard (don't delete the wrong thing) ─────────────────

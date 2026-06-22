@@ -1,6 +1,6 @@
 # system-map — <project name>
 
-> Built by lode-spec at the start, kept current by lode-build (a living current-state map every project has). Lands at `.lode/<project>/system-map.md`
+> Built by lode-spec at the start, kept current by lode-build (a living current-state map every project has). Lands at `.lode/system-map.md`
 > Purpose: let spec know the current state, let plan do impact analysis, let build's changes "look like the existing code."
 
 ## Architecture map

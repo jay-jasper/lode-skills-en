@@ -1,6 +1,6 @@
 # CHANGELOG — <project name>
 
-> Appended by lode-build at each slice's wrap-up. Lands at `.lode/<project>/changelog.md`
+> Appended by lode-build at each slice's wrap-up. Lands at `.lode/changelog.md`
 > Purpose: no context loss across steps · fast pickup in a new Session · changes on record.
 
 ## [slice N] <title> — <date>

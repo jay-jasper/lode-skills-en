@@ -1,4 +1,4 @@
-{"//": "Maintained by lode-auto. Lands at .lode/<project>/ledger.jsonl. Append-only, one event per line, tracking each slice's progress so the goal survives crashes and is auditable. A status is written passed only after the audit/regression/PR actually pass."}
+{"//": "Maintained by lode-auto. Lands at .lode/ledger.jsonl. Append-only, one event per line, tracking each slice's progress so the goal survives crashes and is auditable. A status is written passed only after the audit/regression/PR actually pass."}
 {"ts": "<ISO8601>", "slice": "Slice 1", "status": "doing", "note": "thinnest runnable skeleton"}
 {"ts": "<ISO8601>", "slice": "Slice 1", "status": "passed", "commit": "<hash>", "pr": null, "verify": "build+test green, full regression no new red"}
 {"ts": "<ISO8601>", "slice": "Slice 2", "status": "blocked", "note": "depends on Slice 3's interface not yet defined; or 3 consecutive failures tripped the breaker, stopped to ask the human"}

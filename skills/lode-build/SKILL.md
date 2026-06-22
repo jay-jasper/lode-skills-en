@@ -15,7 +15,7 @@ Mainline step ⑤. Build **slice by slice** per `dev-plan.md`. The point is the 
 
 ## At dev start, auto-write `verify.sh` (the vehicle for the deterministic gate — zero user judgment)
 
-Before touching the first slice, **build automatically** writes **this project's real build + test commands** into `.lode/<project>/verify.sh` (all pass → `exit 0`, any failure → non-zero) — **not a skeleton for the user to fill**:
+Before touching the first slice, **build automatically** writes **this project's real build + test commands** into `.lode/verify.sh` (all pass → `exit 0`, any failure → non-zero) — **not a skeleton for the user to fill**:
 
 - Where the commands come from: changing existing code → the "how to run" section of `system-map.md` (recon already found the real commands); from scratch → the stack you chose (e.g. `npm run build && npm test`).
 - This hands "build with zero errors / all tests pass" — a **deterministic judgment** — to the Stop gate to actually run, instead of model self-assessment.
@@ -30,15 +30,16 @@ The first two steps are **deterministic** — handed to the hook to actually run
 3. **Code Review (judgment · subagent)** — fan out a clean-head subagent to review (see `lode-review`), covering code quality, alignment with the Spec, and for web projects a11y/responsive/key-page performance.
 4. **Functional test (judgment)** — run through each of the slice's **acceptance scenarios** for real (not a vague "it runs"); **demo it if you can** (start a server / screenshot / a run command), not just a green test report.
 
-All four pass → local commit as a rollback point (**no push**) → write the review conclusion into `.lode/<project>/review-passed` (note the reviewed slice/commit, plus a line `tree: <current code fingerprint>` — get it via `lode-gate.sh fingerprint`, or copy the line the gate prints when it blocks; the gate verifies it matches current code, so edits-after-review invalidate it) → **update `.lode/<project>/system-map.md`** (sync this slice's structure/conventions/new interfaces into the current-state map so it stays a live, up-to-date map — the next goal's spec uses it as the current state directly, no need to re-scan code you just wrote) → write the audit report → only then is this slice Done.
+All four pass → local commit as a rollback point (**no push**) → write the review conclusion into `.lode/review-passed` (note the reviewed slice/commit, plus a line `tree: <current code fingerprint>` — get it via `lode-gate.sh fingerprint`, or copy the line the gate prints when it blocks; the gate verifies it matches current code, so edits-after-review invalidate it) → **update `.lode/system-map.md`** (sync this slice's structure/conventions/new interfaces into the current-state map so it stays a live, up-to-date map — the next goal's spec uses it as the current state directly, no need to re-scan code you just wrote) → write the audit report → only then is this slice Done.
 
 ## Done (what counts as acceptable)
 
 For the current slice:
 - Meets the done criteria written in the plan.
-- Passes the four-step audit, and appends the change to `.lode/<project>/changelog.md` (what/why/blast-radius).
+- Passes the four-step audit, and appends the change to `.lode/changelog.md` (**with a timestamp**: time / what / why / blast-radius).
 - After each slice passes review, make a **local commit** (no push) as a rollback point — if a long self-driving loop crashes, you can fall back to the last runnable slice.
-- When design or requirements change, write back to `design-brief.md` / `product-spec.md` / `dev-plan.md` to keep docs in sync.
+- When design or requirements change, write back to `design-brief.md` / `docs/spec.md` / `dev-plan.md` to keep docs in sync.
+- **Reconcile against `docs/spec.md` at wrap-up**: cross-check the built result item by item — ① built something the spec lacks → write it back into the spec or cut it; ② spec has it but it wasn't built → build it or explicitly move to "deferred"; ③ built differently than the spec → fix the code to align, or (intended evolution) update the spec + one line in `docs/spec-changelog.md`. **Once reconciled, the spec must equal the built result.**
 - Keep the current slice synced in the **native todo list** throughout (mark in-progress when you start, tick done only when all four steps pass), so the user sees progress live in the UI; **ticking without passing the gate doesn't count** — passed is judged by `verify.sh` / review for real.
 
 ## Guardrails (red lines)

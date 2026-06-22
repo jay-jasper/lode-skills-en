@@ -21,9 +21,9 @@ Lodestar's autonomous brain. This is what makes "one goal → run to completion 
 
 ## How to run (the autopilot loop)
 
-1. **Set the goal / pick up existing artifacts**: first check `.lode/<project>/` for existing artifacts — **if `product-spec.md` already exists (e.g. you ran `/lode-spec` first to pin the requirements down), use it as the input directly, reading in `design-brief.md` / `mockups/` / `system-map.md` along with it, and never re-gather requirements**; `goal.md` just records the goal + acceptance-testable done criteria and points at that spec. Only do a quick local spec pass when no spec exists (a sentence or two for a small goal).
-2. **Decompose**: decompose **from `product-spec.md` (not the one-line goal)** → milestones → ordered slices (each slice a Goal, tagged with dependencies/parallelizability/blast-radius). Write into `dev-plan.md`.
-3. **Open the ledger + put it on the board**: `.lode/<project>/ledger.jsonl`, one record per slice (status + commit/PR + time); **also mirror the slice list into the native todo list** so the user sees progress live in the UI.
+1. **Set the goal / pick up existing artifacts**: first check `.lode/` for existing artifacts — **if `docs/spec.md` already exists (e.g. you ran `/lode-spec` first to pin the requirements down), use it as the input directly, reading in `design-brief.md` / `mockups/` / `system-map.md` along with it, and never re-gather requirements**; `goal.md` just records the goal + acceptance-testable done criteria and points at that spec. Only do a quick local spec pass when no spec exists (a sentence or two for a small goal): **if the goal is fuzzy, surface your assumptions once** (lay out the goal / scope / form you understood, giving the user a break point — "I'll start unless you correct me") — autonomous ≠ unattended; a few seconds aligning before the run blocks "a wrong assumption compounding through the self-driving loop."
+2. **Decompose**: decompose **from `docs/spec.md` (not the one-line goal)** → milestones → ordered slices (each slice a Goal, tagged with dependencies/parallelizability/blast-radius). Write into `dev-plan.md`.
+3. **Open the ledger + put it on the board**: `.lode/ledger.jsonl`, one record per slice (status + commit/PR + time); **also mirror the slice list into the native todo list** so the user sees progress live in the UI.
 4. **Loop**: read the ledger → pick the next **unblocked** slice → do it with `lode-build` → **four-step audit + full regression** → commit (team mode: open PR, wait for CI/review) → **update the ledger + sync the todo (tick the one just passed, light up the next as in-progress)** → next.
 5. **Replan**: a slice reveals the plan was wrong → go back to `lode-plan`, fix the plan, then continue; **don't grind on a stale plan**.
 6. **Circuit breaker**: ≥3 consecutive failures on the same slice, or a token-budget overrun → stop and ask the user, laying out the sticking point and what's known in one go.
@@ -38,7 +38,7 @@ Lodestar's autonomous brain. This is what makes "one goal → run to completion 
 
 ## Guardrails (red lines)
 
-- **Pick up existing artifacts first**: if `.lode/<project>/` already has `product-spec.md`, read it and decompose from it — don't bypass it and reinvent requirements from a one-line goal; the requirements `/lode-spec` pinned down must not be lost here.
+- **Pick up existing artifacts first**: if `.lode/` already has `docs/spec.md`, read it and decompose from it — don't bypass it and reinvent requirements from a one-line goal; the requirements `/lode-spec` pinned down must not be lost here.
 - **The ledger is the truth**: a status is written `passed` only after the four-step audit/regression/PR actually pass — no optimistic early marking.
 - **Breaker over grinding**: the gate blocks "bad completion," the breaker blocks "expensive non-completion"; if stuck, stop, don't burn tokens.
 - Changing existing code must have `system-map.md` (spec ensures it at the start; large repo → `lode-recon` subagent) and must run full regression; **no baseline, no touching old code**.

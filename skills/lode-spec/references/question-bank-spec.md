@@ -1,6 +1,6 @@
 # Requirements Question Bank (Spec) — starter template
 
-> Used by lode-spec. Lands at `.lode/<project>/question-bank-spec.md`.
+> Used by lode-spec. Lands at `.lode/question-bank-spec.md`.
 > This is the vehicle for "delete the how-to, thicken the what-counts-as-good": it holds **questions + accept/push-back criteria**, not an interview script.
 > Self-evolution only adds/changes/deletes here, and each change maps to one real failure.
 >

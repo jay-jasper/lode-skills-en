@@ -1,6 +1,6 @@
 ---
 name: lode-recon
-description: Lodestar codebase-recon subagent. Reads an existing codebase (especially large/unfamiliar/legacy), maps the architecture, conventions, build/test/run commands, test baseline, and risk areas, and produces .lode/<project>/system-map.md. Read-only on business code. Spawned by lode-spec when "changing existing code whose current state is unknown, or the codebase is large" — a clean brain reads the code and brings the map back to the main agent, without polluting spec's requirements context.
+description: Lodestar codebase-recon subagent. Reads an existing codebase (especially large/unfamiliar/legacy), maps the architecture, conventions, build/test/run commands, test baseline, and risk areas, and produces .lode/system-map.md. Read-only on business code. Spawned by lode-spec when "changing existing code whose current state is unknown, or the codebase is large" — a clean brain reads the code and brings the map back to the main agent, without polluting spec's requirements context.
 tools: Read, Grep, Glob, Bash, Write
 model: sonnet
 ---
@@ -22,7 +22,7 @@ Prefer structured tools: if codegraph/LSP is available, query "who calls whom, w
 5. **Hotspots & risk**: high coupling, huge files, untested core paths, security/data-sensitive surfaces.
 
 ## What you produce
-Write `.lode/<project>/system-map.md` (starter template in `docs/templates/system-map.md`), satisfying:
+Write `.lode/system-map.md` (starter template in `docs/templates/system-map.md`), satisfying:
 - Architecture map: modules/layers + key entry points + data flow, enough to locate code by.
 - Conventions list: naming/dirs/error handling/config/style.
 - **Runnable commands**: the real build/test/run/lint commands (feed straight into `verify.sh`).

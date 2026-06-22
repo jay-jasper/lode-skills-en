@@ -24,7 +24,7 @@ what to build   to concrete into     runs the  + package
                 (optional)
 ```
 
-Each stage produces a doc under `.lode/<project>/`, which feeds the next stage — the AI carries context across stages through these docs, not memory.
+Each stage produces a doc (requirements in the git-tracked `docs/spec.md`, other working drafts under `.lode/`, gitignored by default), which feeds the next stage — the AI carries context across stages through these docs, not memory.
 
 > **What's a slice**: an independent, separately acceptance-testable piece of work. The plan stage (`lode-plan`) splits the goal into slices; you build and accept them one at a time.
 
@@ -43,7 +43,7 @@ Mainline (`①→⑥`):
 
 | # | Command (= skill name) | What it does | Output |
 |---|---|---|---|
-| 1 | `/lode-spec` | **Pin down** a fuzzy idea into a buildable requirement; at the start, get the current-state map ready (when changing existing code → delta = write only what changes) | `product-spec.md` + `system-map.md` |
+| 1 | `/lode-spec` | **Pin down** a fuzzy idea into a buildable requirement; at the start, get the current-state map ready (when changing existing code → delta = write only what changes) | `docs/spec.md` + `system-map.md` |
 | 2 | `/lode-brief` | Translate "feel" into concrete design decisions (optional) | `design-brief.md` |
 | 3 | `/lode-design` | Produce high-fidelity design / clickable prototype (optional) | `mockups/` |
 | 4 | `/lode-plan` | Split into slices (when changing existing code: impact analysis/migration/baseline) | `dev-plan.md` |
@@ -104,7 +104,7 @@ Give one goal; it decides from-scratch/changing-existing-code and solo/team, spl
 
 ### Manual, step by step — when you want to drive each stage
 ```
-/lode-spec    # pin down requirements → product-spec.md
+/lode-spec    # pin down requirements → docs/spec.md
 /lode-plan    # split into slices (each slice's acceptance scenarios first) → dev-plan.md
 /lode-order   # write one slice's order, hand it to the AI → four-step audit loop
 ```
@@ -144,5 +144,5 @@ Building from scratch takes the leanest flow; only when you're changing existing
 | Independent subagents (review / recon / evolve) | `Agent` tool + subagent | `agents/lode-{review,recon,evolve}.md` |
 | Deterministic rules → gate | **Hooks** (plugin `hooks/hooks.json` / project `.claude/settings.json`) | `hooks/` |
 | Self-evolution (signals→proposals→rule base) | `CLAUDE.md` rule base + `lode-evolve` (auto-prompted at session start) | `CLAUDE.md` + `skills/lode-evolve` |
-| Doc-driven | runtime artifacts | `.lode/` (`system-map → product-spec → design-brief → dev-plan → code → changelog`) |
+| Doc-driven | deliverable docs + runtime | `docs/spec*` (git-tracked) + `.lode/` (gitignored: `system-map / design-brief / dev-plan / changelog …`) |
 | order = goal+standards+acceptance+constraints+execution | structured order instruction | `skills/lode-order` |

@@ -10,7 +10,7 @@ Extension skill. The mechanism by which the system gets smarter: distill **real 
 ## Mechanism (the loop)
 
 ```
-You correct it / chew it out  →  record it as a Signal, append to .lode/<project>/signals.jsonl (signal queue)
+You correct it / chew it out  →  record it as a Signal, append to .lode/signals.jsonl (signal queue)
    →  next time a Session opens, during the light self-check (docs/code/signal queue), fan out an Evolution Runner subagent to digest
    →  digest = analyze signals, abstract into rule proposals, write into proposals.md, and decide each: replace existing / supplement / plain-new
    →  lay each out and ask you (add/change/delete)  →  on your confirmation, land it into the relevant Skill's question-bank-*.md or the CLAUDE.md rule base

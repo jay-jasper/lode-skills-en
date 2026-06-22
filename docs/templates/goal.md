@@ -1,6 +1,6 @@
 # GOAL — <goal name>
 
-> Produced by lode-auto. Lands at `.lode/<project>/goal.md`
+> Produced by lode-auto. Lands at `.lode/goal.md`
 > This is the overall goal for the autopilot run (vs order.md: an order is the execution instruction for a single slice; GOAL is the finish line of the whole loop).
 
 ## Goal

@@ -1,6 +1,6 @@
 # DEV PLAN — <project name>
 
-> Produced by lode-plan. Lands at `.lode/<project>/dev-plan.md`
+> Produced by lode-plan. Lands at `.lode/dev-plan.md`
 > Slice = an independent, acceptance-testable vertical slice: once done it compiles, runs, and can be accepted on its own.
 
 ## Mode
@@ -11,7 +11,7 @@
 - Stack:
 - Key decisions + rationale:
 
-## Deterministic Verification (land as `.lode/<project>/verify.sh`)
+## Deterministic Verification (land as `.lode/verify.sh`)
 > Wrap this project's "build + test" into one script, all pass → `exit 0`. The Stop gate actually runs it, moving build/test out of model self-assessment and into a program.
 - Build command: <e.g. `npm run build`>
 - Test command: <e.g. `npm test`>

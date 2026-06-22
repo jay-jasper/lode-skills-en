@@ -26,7 +26,8 @@ In solo mode, "completion" = local build + `review-passed`. **Team / long-lived 
 
 - **Privacy audit passes**: no hard-coded keys/tokens, no accidental collection/upload of user data, permission requests minimal and justified.
 - Production build succeeds, producing a runnable artifact for the target platform.
-- Release notes written (version number, change summary, known limitations), sourced from `changelog.md`.
+- Release notes written (version number, change summary, known limitations), sourced from `.lode/changelog.md` (already timestamped).
+- **Clean up cycle drafts**: after a successful release, record this cycle's gist as one line in `docs/spec-changelog.md`, then delete `.lode/dev-plan.md` and `.lode/changelog.md` (they're cycle scaffolding; durable tracking lives in `docs/spec-changelog.md` + git; once deleted the gate goes dormant and reactivates when the next cycle's dev recreates them).
 - Acceptance/install instructions provided, so the user can get it running.
 - **Actively demo it running**: after packaging/building, run it yourself and screenshot, or give a "install like this, run like this" command — let the user see the finished product running, not just hand over a package.
 - **Team mode**: all PRs passed CI + approved and merged; the release is cut from mainline.

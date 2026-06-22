@@ -1,6 +1,6 @@
 ---
 name: lode-init
-description: "Lodestar extension skill · project init (optional manual escape hatch). One-shot scaffolds the per-project files: top-level CLAUDE.md + .lode/<project>/verify.sh + the .lode directory. Note: in the normal flow these are provisioned automatically — CLAUDE.md is dropped by lode-spec at the start, verify.sh is written by lode-build when development starts; the user need not invoke this. Use only to pre-scaffold manually, or to repair when auto-provisioning didn't kick in. Trigger: /lode-init"
+description: "Lodestar extension skill · project init (optional manual escape hatch). One-shot scaffolds the per-project files: top-level CLAUDE.md + .lode/verify.sh + the .lode directory. Note: in the normal flow these are provisioned automatically — CLAUDE.md is dropped by lode-spec at the start, verify.sh is written by lode-build when development starts; the user need not invoke this. Use only to pre-scaffold manually, or to repair when auto-provisioning didn't kick in. Trigger: /lode-init"
 ---
 
 # Init (project initialization · optional manual escape hatch)
@@ -16,19 +16,17 @@ Extension skill. Lays down the per-project files in one shot.
 
 ## What it does (scaffold three things, fill what's missing)
 
-`<project>` = the current project's directory name.
-
 1. **Top-level rules `CLAUDE.md` → project root**: Lodestar's operating conventions.
    - Source location: plugin install → `${CLAUDE_PLUGIN_ROOT}/CLAUDE.md`; script install → `~/.claude/lodestar/CLAUDE.md`. Probe with `echo "$CLAUDE_PLUGIN_ROOT"` first; if empty, look under `~/.claude/lodestar/`; **if you can't find it, stop and ask the user where Lodestar is installed** — don't regenerate one from memory (it'll be stale).
-2. **`.lode/<project>/verify.sh` skeleton**: copy from `~/.claude/lodestar/templates/verify.sh` (plugin install: `${CLAUDE_PLUGIN_ROOT}/docs/templates/verify.sh`), `chmod +x`. **Lay the skeleton now; the real commands are normally written by the first `lode-build`**.
-3. **`.lode/<project>/` directory**: create it; all later artifacts (spec/plan/changelog…) land here.
+2. **`.lode/verify.sh` skeleton**: copy from `~/.claude/lodestar/templates/verify.sh` (plugin install: `${CLAUDE_PLUGIN_ROOT}/docs/templates/verify.sh`), `chmod +x`. **Lay the skeleton now; the real commands are normally written by the first `lode-build`**.
+3. **`docs/` + `.lode/` directories + `.gitignore`**: create `docs/` (holds `spec.md`/`spec-changelog.md`) and `.lode/` (runtime artifacts); and ensure the project `.gitignore` **ignores `.lode/`** (runtime stays out of git) and **tracks `docs/spec*.md`**.
 
 > A script install (non-plugin) still needs the `hooks` block from `hooks/settings.json` merged into `.claude/settings.json` — that's not lode-init's job, see README. A plugin install already has the gate active.
 
 ## Done (what counts as good)
 
 - The project root has `CLAUDE.md` (created this run, or confirmed present with a merge note).
-- `.lode/<project>/verify.sh` exists and is executable.
+- `.lode/verify.sh` exists and is executable.
 - Close with a one-line pointer: from scratch → next is `lode-spec`, changing existing code → next is still `lode-spec` (it gets system-map ready at the start).
 
 ## Guardrails (red lines)
