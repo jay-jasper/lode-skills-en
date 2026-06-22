@@ -27,3 +27,6 @@ Extension skill. Systematically fix defects: reproduce first, then locate, make 
 - Fix the implementation, don't change tests to mask the problem (unless the test itself is wrong).
 - Fix one root cause at a time; don't smuggle in unrelated changes that widen the blast radius.
 - After fixing, run the full set of related tests to confirm no new red was introduced.
+
+## → Next
+Fixed → back to `/lode-build` to wrap up (four-step audit + gate); if it is a pitfall worth remembering → `/lode-evolve` to distill a rule.

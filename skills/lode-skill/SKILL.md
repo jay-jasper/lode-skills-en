@@ -1,11 +1,11 @@
 ---
 name: lode-skill
-description: "Lodestar extension — build a new skill (the 11th). Write a capability into a new Skill. Use when the user needs to add a new capability to the system or product, or to create/rewrite a SKILL.md. Trigger: /lode-skill"
+description: "Lodestar extension — build a new skill. Write a capability into a new Skill. Use when the user needs to add a new capability to the system or product, or to create/rewrite a SKILL.md. Trigger: /lode-skill"
 ---
 
 # Skill Builder
 
-Extension skill. Distill a capability into a new `SKILL.md`. The 11th skill in the paradigm.
+Extension skill. Distill a capability into a new `SKILL.md`. The paradigm's skill for making skills.
 
 ## Usage (when to use)
 

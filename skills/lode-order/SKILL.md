@@ -44,4 +44,7 @@ I'm setting this order on these assumptions; correct them now if wrong:
 
 - Done criteria can't be "close enough / looks fine"; not judgeable = no standard.
 - The order defines the finish line, not the implementation steps.
-- A popup/draft, once written, usually needs no second edit, unless there's a special goal to add.
+- An order, once written, usually needs no second pass before you send it — unless the goal calls for something extra.
+
+## → Next
+Send the order → the AI self-drives that slice; once it passes the four-step audit + gate, write the next one or hand off to `/lode-auto`.

@@ -13,7 +13,7 @@ Mainline step ②. Like a designer interviewing a client: take the vague "feel/t
 - The user has expectations about the look but can only describe them with adjectives ("more premium," "clean," "techy").
 - Before building a high-fidelity mockup (`lode-design`) or writing frontend, settle the conventions first.
 
-## How to ask (force "feel" into decisions)
+## How to ask (turn "feel" into concrete decisions)
 
 Lean on a question bank (starter template in this skill's `references/question-bank-design.md`), converging item by item with **multiple choice**:
 
