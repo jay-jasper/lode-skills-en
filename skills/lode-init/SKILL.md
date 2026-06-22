@@ -33,6 +33,6 @@ Extension skill. Lays down the per-project files in one shot.
 
 ## Guardrails (red lines)
 
-- **Never overwrite an existing `CLAUDE.md` / `verify.sh`**: if present, tell the user how to merge; don't silently clobber their files.
+- **Never overwrite an existing `CLAUDE.md` / `verify.sh`**: if the project already has a `CLAUDE.md` (likely the user's own project rules), leave it; only with the user's OK append Lodestar rules in a `<!-- LODESTAR:BEGIN/END -->` block; keep an existing `verify.sh`. Never silently clobber their files.
 - **Scaffold only**: don't guess the project's build/test commands — that's `lode-spec`'s start / `lode-build`'s job.
 - If you can't find the source files, stop and ask; don't fabricate a stale `CLAUDE.md`.
