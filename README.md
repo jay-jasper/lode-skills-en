@@ -141,10 +141,10 @@ Building from scratch takes the leanest flow; only when you're changing existing
 
 | Concept | Claude Code mechanism | Location in this repo |
 |---|---|---|
-| 14 skills | `SKILL.md` skills | `skills/lode-*` |
+| 13 skills | `SKILL.md` skills | `skills/lode-*` |
 | Top-level rules | `CLAUDE.md` | `CLAUDE.md` |
-| Independent reviewer subagent | `Agent` tool + subagent | `agents/lode-review.md` |
+| Independent subagents (review / recon / evolve) | `Agent` tool + subagent | `agents/lode-{review,recon,evolve}.md` |
 | Deterministic rules → gate | **Hooks** (plugin `hooks/hooks.json` / project `.claude/settings.json`) | `hooks/` |
 | Self-evolution (signals→proposals→rule base) | `CLAUDE.md` rule base + `lode-evolve` | `CLAUDE.md` + `skills/lode-evolve` |
-| Doc-driven | runtime artifacts | `.lode/` (`product-spec → design-brief → dev-plan → code → changelog`) |
+| Doc-driven | runtime artifacts | `.lode/` (`system-map → product-spec → design-brief → dev-plan → code → changelog`) |
 | Go = goal+standards+acceptance+constraints+execution | structured Go instruction | `skills/lode-go` |
