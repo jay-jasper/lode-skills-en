@@ -22,13 +22,19 @@ cd "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null || true
 # Pick an available sha256 tool
 _sha() { if command -v shasum >/dev/null 2>&1; then shasum -a 256; else sha256sum; fi; }
 
-# Code fingerprint: git repo → HEAD + staged + working-tree changes (content-level, accurate);
+# Code fingerprint: git repo → HEAD + staged content + working-tree changes (content-level, accurate).
+#   MUST exclude .lode/ itself — the gate writes review-passed/.verify-green/.gate-attempts there,
+#   and if not excluded those bookkeeping files (which show up as untracked in porcelain when the user
+#   hasn't gitignored .lode) would feed back into the fingerprint, causing a "write marker → next
+#   fingerprint already changed → reviewed-then-mismatched" deadlock until the breaker trips.
+#   The non-git branch hard-excludes .lode the same way.
 # non-git → content hash of working-tree files (excludes build/dep dirs; no .gitignore awareness).
 fingerprint() {
   if git rev-parse --git-dir >/dev/null 2>&1; then
     { git rev-parse HEAD 2>/dev/null || true
-      git status --porcelain 2>/dev/null || true
-      git diff 2>/dev/null || true; } | _sha | awk '{print $1}'
+      git status --porcelain -- . ':(exclude).lode' 2>/dev/null || true
+      git diff            -- . ':(exclude).lode' 2>/dev/null || true
+      git diff --cached   -- . ':(exclude).lode' 2>/dev/null || true; } | _sha | awk '{print $1}'
   else
     find . -type d \( -name .git -o -name .lode -o -name node_modules -o -name dist -o -name build \
         -o -name target -o -name .next -o -name vendor -o -name __pycache__ \) -prune -o \

@@ -27,7 +27,7 @@ Mainline step ③ (optional). Turn `design-brief.md` into **high-fidelity mockup
 ## Done (what counts as acceptable)
 
 Produce `.lode/mockups/` (high-fidelity HTML/JSX etc. that runs in a browser), satisfying:
-- Strictly lands the Design Brief's tokens and direction; don't start a second style.
+- Strictly lands the Design Brief's design tokens and direction; don't start a second style.
 - Covers the key pages and key states (empty/loading/error) of the core flow.
 - The prototype clicks through the main flow — not a pile of dead images.
 - Consistent with the spec's scope; don't draw out-of-scope pages.

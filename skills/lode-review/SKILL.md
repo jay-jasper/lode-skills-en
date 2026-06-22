@@ -24,7 +24,7 @@ Return a structured review report covering the **four-step audit**: build verifi
 - **Test completeness is checked spec-bound**: every "acceptance scenario" of this slice has a corresponding test, and the tests test the requirement, not the implementation; the functional test **runs each acceptance scenario** — "tests exist and are green" is not a pass.
 - Each issue graded by severity: CRITICAL / HIGH / MEDIUM / LOW.
 - A clear verdict: **pass / fail** (any CRITICAL = fail).
-- On pass, the **main agent** writes the conclusion into `.lode/review-passed` (note the reviewed slice/commit, plus a line `tree: <current code fingerprint>` — get it via `lode-gate.sh fingerprint`). The gate lets it through on that basis, and verifies the fingerprint matches current code: **edit-after-review invalidates the marker and requires a re-review**.
+- On pass, the **main agent** writes the conclusion into `.lode/review-passed` (note the reviewed slice/commit, plus a line `tree: <current code fingerprint>` — just copy the line the gate prints when it blocks; no need to compute it yourself). The gate lets it through on that basis, and verifies the fingerprint matches current code: **edit-after-review invalidates the marker and requires a re-review**.
 - On fail, each blocking item states "why + how to fix"; the main agent fixes and runs another round until Pass.
 
 **Changing existing code / team / safety-critical extra review:**
