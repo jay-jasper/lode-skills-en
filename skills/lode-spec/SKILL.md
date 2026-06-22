@@ -104,4 +104,6 @@ Produce `.lode/<project>/product-spec.md` that satisfies:
 - Confirm with the user before moving to the next step.
 
 ## → Next
-Requirements set → `/lode-plan` to split into slices (if the UI is make-or-break, `/lode-brief` first).
+Requirements set, pick one:
+- Want to drive each step → `/lode-plan` to split into slices (if the UI is make-or-break, `/lode-brief` first).
+- Want the agent to run the rest to completion → `/lode-auto` (it takes **this `product-spec.md` as input directly** to decompose the plan and build slice by slice — it won't re-ask for requirements).
