@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
-# Lodestar uninstaller (for the script install). Removes the user-level Lodestar files + un-wires the
-# gate from settings.json. Your per-project .lode/, project CLAUDE.md, and verify.sh are YOUR artifacts
-# and are never touched — remove them yourself if you want.
+# Lodestar uninstaller (for the script install). Removes user-level Lodestar files + un-wires the gate
+# from settings.json. By default it does NOT touch your per-project .lode/, project CLAUDE.md, verify.sh.
+# With --purge-project it also deletes the CURRENT directory's .lode/ (prompts first when interactive;
+# the project-root CLAUDE.md is still left alone).
 #
 # Usage:
-#   bash ~/.claude/lode-uninstall.sh                 # left here by the installer; works offline
-#   curl -fsSL https://raw.githubusercontent.com/Leejaywell/lode-skills-en/main/uninstall.sh | bash
-#   CLAUDE_HOME=/path bash uninstall.sh              # custom Claude home
+#   bash ~/.claude/lode-uninstall.sh                      # tool only
+#   bash ~/.claude/lode-uninstall.sh --purge-project      # also clear this project's .lode/
+#   curl -fsSL https://raw.githubusercontent.com/Leejaywell/lode-skills-en/main/uninstall.sh | bash -s -- --purge-project
+#   CLAUDE_HOME=/path bash uninstall.sh                   # custom Claude home
 set -euo pipefail
 DEST="${CLAUDE_HOME:-$HOME/.claude}"
+PURGE=0; if [ "${1:-}" = "--purge-project" ]; then PURGE=1; fi
 
 # 1) Un-wire the Lodestar gate from settings.json (remove only our two entries; keep all others; prune empties)
 if [ -f "$DEST/settings.json" ] && command -v python3 >/dev/null 2>&1; then
@@ -42,11 +45,25 @@ fi
 rm -rf "$DEST/lode-hooks" "$DEST/lodestar"
 rm -rf "$DEST"/skills/lode-* 2>/dev/null || true
 rm -f "$DEST"/agents/lode-review.md "$DEST"/agents/lode-recon.md "$DEST"/agents/lode-evolve.md 2>/dev/null || true
-
 echo "Lodestar removed from $DEST (skills/subagents/gate scripts/source assets)."
-echo "  Your per-project files are UNTOUCHED: .lode/, project CLAUDE.md, verify.sh."
-echo "  To drop those in a project too:  rm -rf .lode   (and CLAUDE.md/verify.sh by hand if you want)"
-echo "  (Plugin install instead? use: /plugin uninstall lodestar@lodestar  and  /plugin marketplace remove lodestar)"
 
-# 3) Finally remove the uninstaller itself (it lives at $DEST root, not in a removed dir)
-rm -f "$0" 2>/dev/null || true
+# 3) Optional: clear the CURRENT directory's .lode/ (runtime docs)
+if [ "$PURGE" = "1" ]; then
+  if [ -d ".lode" ]; then
+    ans=yes
+    if [ -t 0 ]; then
+      printf "Also delete ./.lode (all runtime docs in THIS project, unrecoverable)? [y/N] " >&2
+      read -r reply; case "$reply" in y|Y|yes|YES) ans=yes;; *) ans=no;; esac
+    fi
+    if [ "$ans" = "yes" ]; then rm -rf ./.lode && echo "-> removed ./.lode"; else echo "-> kept ./.lode"; fi
+  else
+    echo "-> no ./.lode in the current directory."
+  fi
+  echo "   Note: the project-root CLAUDE.md / verify.sh are still left alone (may be your own rules) — remove by hand if you want."
+else
+  echo "   Your per-project .lode/, CLAUDE.md, verify.sh were left UNTOUCHED. To clear the docs too: run with --purge-project in the project, or 'rm -rf .lode'."
+fi
+echo "   (Plugin install instead? use: /plugin uninstall lodestar@lodestar  and  /plugin marketplace remove lodestar)"
+
+# 4) Finally remove the uninstaller itself (only when $0 is the real script path, so curl|bash won't rm the wrong thing)
+case "$0" in */lode-uninstall.sh) rm -f "$0" 2>/dev/null || true ;; esac

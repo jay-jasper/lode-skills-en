@@ -102,7 +102,7 @@ curl -fsSL https://raw.githubusercontent.com/Leejaywell/lode-skills-en/main/inst
 
 - **Plugin install**: `/plugin uninstall lodestar@lodestar`, then `/plugin marketplace remove lodestar`.
 - **Script install**: `bash ~/.claude/lode-uninstall.sh` (left there by the installer; works offline — or remote `curl -fsSL https://raw.githubusercontent.com/Leejaywell/lode-skills-en/main/uninstall.sh | bash`). It removes Lodestar's skills/subagents/gate scripts/source assets and **un-wires the gate from `~/.claude/settings.json`** — only our two entries; your other hooks stay, original backed up to `.bak`.
-- Either way, your per-project `.lode/`, project `CLAUDE.md`, and `verify.sh` are **left untouched** (they're your artifacts) — to clear them, `rm -rf .lode` in that project yourself.
+- By default your per-project `.lode/`, project `CLAUDE.md`, and `verify.sh` are **left untouched** (they're your artifacts). To clear the docs too: run `bash ~/.claude/lode-uninstall.sh --purge-project` in that project (deletes **this project's** `.lode/`, prompts first when interactive; the project-root `CLAUDE.md` is still left alone), or just `rm -rf .lode`.
 
 ---
 
