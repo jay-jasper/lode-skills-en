@@ -26,8 +26,8 @@ In solo mode, "completion" = local build + `review-passed`. **Team / long-lived 
 
 - **Privacy audit passes**: no hard-coded keys/tokens, no accidental collection/upload of user data, permission requests minimal and justified.
 - Production build succeeds, producing a runnable artifact for the target platform.
-- Release notes written (version number, change summary, known limitations), sourced from `.lode/changelog.md` (already timestamped).
-- **Clean up cycle drafts**: after a successful release, record this cycle's gist as one line in `docs/spec-changelog.md`, then delete `.lode/dev-plan.md` and `.lode/changelog.md` (they're cycle scaffolding; durable tracking lives in `docs/spec-changelog.md` + git; once deleted the gate goes dormant and reactivates when the next cycle's dev recreates them).
+- Release notes written (version number, change summary, known limitations), sourced from **`git log` since the last tag** (per-slice commits are the change stream; non-git projects fall back to `.lode/changelog.md`).
+- **Clean up cycle drafts + disarm the gate**: after a successful release, record this cycle's gist as one line in `docs/spec-changelog.md`, then delete the `.lode/plan/` and `.lode/design/` directories, the `.lode/.building` arm marker, and `.lode/changelog.md` (if any) (they're cycle scaffolding, all historical versions included; durable tracking lives in `docs/spec-changelog.md` + `docs/architecture.md` + git; once `.building` is deleted the gate goes dormant and reactivates when the next cycle's first slice re-touches it).
 - Acceptance/install instructions provided, so the user can get it running.
 - **Actively demo it running**: after packaging/building, run it yourself and screenshot, or give a "install like this, run like this" command — let the user see the finished product running, not just hand over a package.
 - **Team mode**: all PRs passed CI + approved and merged; the release is cut from mainline.

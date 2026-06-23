@@ -3,7 +3,7 @@
 # First principle: anything a program can judge becomes a hard gate — not the model's good intentions,
 #   and not just a model-written flag.
 #
-# Two hard checks (only blocks a workspace where dev has STARTED = changelog.md exists; spec/plan pass):
+# Two hard checks (only blocks a workspace where dev has STARTED = .lode/.building marker exists; spec/plan pass):
 #   ① Deterministic verification: actually run .lode/verify.sh (build + full test); the exit code decides.
 #      — Skipped (cached) when the fingerprint is unchanged and last run was green (no full rebuild every Stop).
 #   ② Review passed: review-passed is non-empty AND contains the CURRENT code fingerprint —
@@ -49,8 +49,8 @@ if [ "${1:-}" = "fingerprint" ]; then fingerprint; exit 0; fi
 # Consume stdin (the Stop hook JSON); don't block, don't depend on it
 cat >/dev/null 2>&1 || true
 
-# Has dev started (.lode/changelog.md exists)? If not => pass (spec/plan stage, or a non-Lodestar project)
-[ -f ".lode/changelog.md" ] || exit 0
+# Has dev started (.lode/.building marker exists, touched by build at the first slice)? If not => pass (spec/plan stage, or a non-Lodestar project)
+[ -f ".lode/.building" ] || exit 0
 
 MAX_ATTEMPTS="${LODE_GATE_MAX_ATTEMPTS:-5}"
 ATTEMPTS_FILE=".lode/.gate-attempts"

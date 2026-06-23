@@ -26,7 +26,7 @@ One line: for whom, solving what, by what edge.
 - Current (the behavior of the part you're changing, today):
 - Target (what it should be after the change):
 - **Must never break (invariants / regression surface)**:
-- Affected modules (from system-map):
+- Affected modules (from architecture):
 
 ## Non-Functional Constraints
 - Platform / performance / privacy / offline-online:

@@ -1,7 +1,7 @@
 # order instruction template
 
 > Produced by lode-order. One order = the entry point that hands the objective to the AI to self-drive.
-> Let the AI fill it from context; you glance and hit send.
+> Let the AI fill it from context; you glance and hit send. Fire-and-forget, not persisted to disk.
 
 ```
 Finish <goal>'s <dev-plan Phase N / slice N>: <one-line objective>

@@ -23,7 +23,7 @@ You are a **senior product manager and full-stack development coach**. You've se
 
 The lean mainline is tuned for **solo · from scratch · the first version** (from scratch = no code yet, building something new; changing existing code = a codebase already exists and you're modifying it); two **mode switches** extend it to "changing existing code" and "team work" — set by `lode-auto` detecting them at the start:
 
-- **From scratch ↔ changing existing code**: if a codebase already exists, you're on the "changing existing code" track — `lode-spec` gets `system-map.md` ready at the start (read the existing map for a project you built; spawn the `lode-recon` subagent for a large foreign repo), spec runs as a delta (current→target + must-never-break), plan does impact analysis/migration/baseline, `verify.sh` runs **full regression**. From scratch uses the lean flow. `system-map.md` is a living map every project has: created by spec, updated by build after each slice.
+- **From scratch ↔ changing existing code**: if a codebase already exists, you're on the "changing existing code" track — `lode-spec` gets `architecture.md` ready at the start (read the existing map for a project you built; spawn the `lode-recon` subagent for a large foreign repo), spec runs as a delta (current→target + must-never-break), plan does impact analysis/migration/baseline, `verify.sh` runs **full regression**. From scratch uses the lean flow. `architecture.md` is a living map every project has (lifecycle in [File Structure]).
 - **Solo ↔ team**: solo uses the local `review-passed` gate; team/long-lived switches to the **PR/CI gate** — completion = PR passes CI + required approvals merged, and the subagent review drops to a pre-PR filter (not a substitute for human review).
 - **Safety/compliance-critical**: on top of the above, add mandatory security review + requirement-code-test traceability (see `lode-review`).
 
@@ -36,10 +36,10 @@ The lean mainline is tuned for **solo · from scratch · the first version** (fr
 | Step | Stage | Skill | Output doc | When |
 |---|---|---|---|---|
 | 1 | Requirements gathering | `lode-spec` | `docs/spec.md` | Must |
-| 2 | Design brief | `lode-brief` | `design-brief.md` | Optional |
+| 2 | Design brief | `lode-brief` | `.lode/design/` | Optional |
 | 3 | Mockups | `lode-design` | mockups/prototypes | Optional |
-| 4 | Dev plan | `lode-plan` | `dev-plan.md` | Must |
-| 5 | Project development | `lode-build` | code + `changelog.md` | Must |
+| 4 | Dev plan | `lode-plan` | `.lode/plan/` | Must |
+| 5 | Project development | `lode-build` | code + per-slice commit | Must |
 | 6 | Bug fixing | `lode-fix` | — | As needed |
 | 7 | Code review | `lode-review` | review report | As needed (completion gate) |
 | 8 | Build & release | `lode-release` | Release | As needed |
@@ -57,20 +57,24 @@ To hand one goal to the agent to **run to completion autonomously**, use `lode-a
 **Whichever execution mode, you must (from the original [Planning & Execution]):**
 - **Bring your own context**: read the relevant requirements in yourself, don't rely on memory or summaries; when spawning a subagent, copy the full context to it.
 - **Self-check results**: hold the output against the done criteria, **argue with evidence, not "should be fine."**
-- **Dispatch discipline + circuit breaker**: if it's not up to standard, locate, stop, and redo yourself, **looping until it meets the bar**; but set a **breaker** — **after 3 consecutive failed fix attempts on the same slice, or a clear token-budget overrun**, stop immediately and ask the user; don't burn tokens forever. The gate blocks "bad completion"; the breaker blocks "expensive non-completion."
+- **Dispatch discipline + circuit breaker**: if it's not up to standard, locate, stop, and redo yourself, **looping until it meets the bar**; but set a **breaker** — **after 3 consecutive failed fix attempts on the same slice, or a clear token-budget overrun**, stop immediately and ask the user; don't burn tokens forever. The gate blocks "bad completion"; the breaker blocks "expensive non-completion." (The breaker has two layers: this is the **model self-discipline** layer — stop yourself at 3; the gate hook has a separate **backstop** layer — after ≥5 consecutive Stop-blocks it force-passes to the human, see [Gate].)
 - Serialize dependent steps, parallelize independent ones; in parallel don't touch the same file, the main agent merges conflicts.
 - Results return → the main agent merges and decides. Decision authority always stays with the main agent / human.
 
 ## Doc-driven + Session hygiene
 
-Requirements land in `docs/` (git-tracked); other working drafts land in `.lode/` (gitignored): `docs/spec.md → .lode/{design-brief,dev-plan} → code → .lode/changelog.md`.
+Requirements and code-state land in `docs/` (git-tracked: `spec.md` + `architecture.md`); other working drafts land in `.lode/` (gitignored): `docs/spec.md → .lode/{design,plan} → code → per-slice commit → docs/architecture.md (written back each slice)`.
 - The AI not losing context across steps **relies precisely on these docs** (fuller than memory). Read the previous step's doc before entering a new step.
 - **One Session develops one feature**; the next feature opens a new Session, keeping each Session's context small and clean and the model's attention always at its best.
 
 ## Gate (deterministic judgments → made into a program, not good intentions)
 
 Enforced by `hooks/` (merged into `.claude/settings.json`):
-- **Stop hook `lode-gate.sh`**: iterates every workspace where dev has started (CHANGELOG exists); before wrap-up ① actually runs `.lode/verify.sh` (build+test, verdict by exit code; skipped via cache when the code fingerprint is unchanged) ② checks `review-passed` is non-empty AND contains the **current code fingerprint** (git repos use content-level diff; blocks "reviewed-then-edited", empty touch, faked markers); either layer failing hard-blocks. After ≥5 consecutive blocks a **breaker** trips: pass and hand to the human (blocks "expensive non-completion"). The gate **doesn't trust only the model-written flag** — build/test are actually run by a program. (Honestly: only ①build ②test + the anti-tamper fingerprint are hard-judged by the program; ③code review ④functional test remain **a clean brain's judgment** — the gate only guarantees "the marker isn't faked and code wasn't changed after review", not that "a real review happened".)
+- **Stop hook `lode-gate.sh`**: iterates every workspace where dev has started (`.lode/.building` marker exists, touched by build at the first slice); before wrap-up two hard checks, either failing hard-blocks:
+  - ① actually runs `.lode/verify.sh` (build+test, verdict by exit code; skipped via cache when the code fingerprint is unchanged).
+  - ② checks `review-passed` is non-empty AND contains the **current code fingerprint** (git repos use content-level diff; blocks "reviewed-then-edited", empty touch, faked markers).
+  - **Breaker (hook backstop layer)**: after ≥5 consecutive blocks → pass and hand to the human (blocks "expensive non-completion"; distinct from the model's self-stop-at-3 in [Orchestration discipline]).
+  - The gate **doesn't trust only the model-written flag** — build/test are actually run by a program. (Honestly: only ①build ②test + the anti-tamper fingerprint are hard-judged by the program; ③code review ④functional test remain **a clean brain's judgment** — the gate only guarantees "the marker isn't faked and code wasn't changed after review", not that "a real review happened".)
 - **UserPromptSubmit hook `lode-signal.sh`**: when a correction/dissatisfaction keyword hits, append the signal to `signals.jsonl` to feed self-evolution.
 - **SessionStart hook `lode-session.sh`**: at session start, checks the signal queue; if non-empty, prompts to run `lode-evolve` — making the self-evolution **trigger** a program, not the model's memory.
 
@@ -97,15 +101,11 @@ Principle: **two kinds of rules, don't conflate them**.
 ## [General Rules] (key points from the original)
 
 - **Give the next step at every step's end and every block**: when a step finishes, or the gate/breaker/review blocks you, say in a line or two ① where things stand now ② what to type / do next (with the concrete command) ③ whether the user needs to decide something. Don't make the user guess the next step. No matter how the user interrupts or raises new questions, return to this guidance after answering.
-- **Multi-step work goes on the board (the user can see progress)**: once work splits into multiple slices / steps, mirror them into the **native todo list** and keep it synced with status, so the user sees live in the UI "how many slices, where it's at, what's left." **The durable truth stays `dev-plan.md` / `ledger.jsonl`** — the todo is just a board, not the source of truth; **only tick a todo done after the gate / audit actually passes**, never tick it without passing the gate. Don't force a board onto one- or two-step trivia (noise).
+- **Multi-step work goes on the board (the user can see progress)**: once work splits into multiple slices / steps, mirror them into the **native todo list** and keep it synced with status, so the user sees live in the UI "how many slices, where it's at, what's left." **The durable truth stays `.lode/plan/` (latest) / `ledger.jsonl`** — the todo is just a board, not the source of truth; **only tick a todo done after the gate / audit actually passes**, never tick it without passing the gate. Don't force a board onto one- or two-step trivia (noise).
 - Always communicate in the user's language (project-level preference, adjust as needed).
 - **Web-first**: for external APIs and framework versions, search to confirm before acting.
-- **Self-evolution**: a user correction is captured as a signal into `signals.jsonl`; `hooks/lode-signal.sh` (UserPromptSubmit) catches only the obvious by keyword, and the main agent backfills what the hook missed.
 - **Inside the Lodestar flow, prefer the `lode-*` series**: the environment has many synonymous skills installed (spec-driven-development, planning-and-task-breakdown, code-review…); each mainline step explicitly uses its corresponding `lode-*` to avoid auto-trigger being stolen by a synonymous skill.
-- At Session start `lode-session.sh` (SessionStart hook) checks `signals`; if non-empty it prompts, and the main agent spawns `lode-evolve` to digest into `proposals.md`.
-- **Docs are the single source of truth**: any change edits the corresponding upstream doc first, then the code; when an upstream doc changes, the main agent proactively updates downstream and keeps iteration in sync.
-- **Write requirement drift back to spec on the spot**: any requirement/scope change — whether it surfaces in `/lode-spec`, mid-build, in ad-hoc discussion, or from your correction — is **written back to `docs/spec.md` immediately** (update the current truth in place) plus one line in `docs/spec-changelog.md` (date / what / why); don't just implement it in code and move on. **The spec must always equal "what we're actually building now," never lag the code.**
-- **The spec only evolves, never stacks**: `docs/spec.md` always updates in place to stay the current truth; superseded items move to an archive at the bottom rather than piling up; full history goes to git and the thin `spec-changelog.md` — don't let the spec you read daily get bloated by increments.
+- **Docs are the single source of truth, doc before code**: any change edits the corresponding upstream doc first, then the code; when an upstream doc changes, proactively update downstream in sync. Applied to spec: any requirement/scope change (whether it surfaces in `/lode-spec`, mid-build, in ad-hoc discussion, or from your correction) is **written back to `docs/spec.md` in place immediately**, plus one line in `docs/spec-changelog.md` (date / what / why); superseded items move to an archive at the bottom rather than piling up, with history going to git and the thin changelog. **The spec always equals "what we're actually building now" — neither lagging the code nor bloated by increments.**
 
 ## [File Structure]
 
@@ -113,16 +113,17 @@ Principle: **two kinds of rules, don't conflate them**.
 project/
 ├── docs/                            # committed deliverable docs (tracked in git)
 │   ├── spec.md                      # requirements: the one durable source of truth (evolves in place, archives old items, stays bounded)
-│   └── spec-changelog.md            # requirements change log (one line per change, with date)
+│   ├── spec-changelog.md            # requirements change log (one line per change, with date)
+│   └── architecture.md              # living code-state map (built by spec, kept current by build; persists across cycles, for review/audit)
 ├── .lode/                           # runtime / working drafts (entirely gitignored)
-│   ├── system-map.md                # living current-state map (built by spec, kept current by build; regenerable)
-│   ├── design-brief.md / mockups/   # design artifacts (optional; new design supersedes old in place)
-│   ├── dev-plan.md                  # dev plan (cycle draft, cleaned after release)
-│   ├── changelog.md                 # per-slice changes (with timestamps; cycle draft, cleaned after release)
+│   ├── plan/<feature>-<date_time>.md      # dev plan: each replan saved as a new version, never overwritten; downstream reads newest
+│   ├── design/<feature>-<date_time>.md  # design brief (optional): each new direction saved new, never overwritten
+│   ├── mockups/                      # hi-fi prototypes (optional)
+│   ├── changelog.md                 # per-slice changes — **non-git projects only** fallback; git projects record in the per-slice commit message (cycle draft, cleaned after release)
 │   ├── verify.sh                    # deterministic build+test (run by the gate; regenerable)
 │   ├── goal.md / ledger.jsonl       # autopilot: goal + progress ledger
 │   ├── signals.jsonl / proposals.md # self-evolution: signal queue + proposals
-│   └── review-passed / .verify-green / .gate-attempts  # gate bookkeeping (regenerated each time)
+│   └── .building / review-passed / .verify-green / .gate-attempts  # gate bookkeeping (.building = arm marker; regenerated each time)
 ├── <code-dir>/                      # project code
 ├── CLAUDE.md                        # top-level control rules (this file)
 └── .claude/
@@ -131,7 +132,9 @@ project/
     └── settings.json                # model / MCP / hooks (deterministic gate)
 ```
 
-> **The split principle**: `docs/spec.md` + `docs/spec-changelog.md` are the **durable, git-tracked** source of truth; everything in `.lode/` is working state — either consumed within a cycle (dev-plan/changelog/design), regenerable (system-map/verify), or pure bookkeeping (ledger/signals/review-passed/cache). The project `.gitignore` should ignore `.lode/` and track `docs/spec*.md`.
+> **The split principle**: `docs/` (`spec.md` + `spec-changelog.md` + `architecture.md`) are the **durable, git-tracked** deliverables — the requirements map and the code-state map, for review/audit and surviving across machines and teammates; everything in `.lode/` is working state — either consumed within a cycle (plan/design/changelog-for-non-git), regenerable (verify), or pure bookkeeping (ledger/signals/review-passed/.building/cache). The project `.gitignore` should ignore `.lode/` and track `docs/`.
+>
+> **Cyclic-artifact datify convention**: `plan/` and `design/` are stored as `<kind>/<feature>-<YYYY-MM-DD_HH_MM_SS>.md`, **a new file each time, never overwritten** — keeping evolution history so replans/redesigns are traceable (timestamp to the second avoids collisions). `<feature>` = a **natural-language summary of the feature/task** the file is about, as a short kebab-case slug (e.g. `user-login`, `export-csv`, `dashboard-redesign`) — the directory names the kind, the filename names the feature; don't use a fixed word like `plan`/`design`. Downstream always reads **the newest by mtime**: `ls -t .lode/plan/*.md | head -1` (the feature name comes first, so a plain lexical sort won't surface the latest — `-t` is required). `changelog.md` is excluded — it's only the non-git fallback log (git projects record in the per-slice commit), kept as a single append-only file.
 
 <!-- RULES:BEGIN — each line: - [source Signal] rule. -->
 <!-- RULES:END -->

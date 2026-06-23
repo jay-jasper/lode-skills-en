@@ -19,7 +19,7 @@ Extension skill. Lays down the per-project files in one shot.
 1. **Top-level rules `CLAUDE.md` → project root**: Lodestar's operating conventions.
    - Source location: plugin install → `${CLAUDE_PLUGIN_ROOT}/CLAUDE.md`; script install → `~/.claude/lodestar/CLAUDE.md`. Probe with `echo "$CLAUDE_PLUGIN_ROOT"` first; if empty, look under `~/.claude/lodestar/`; **if you can't find it, stop and ask the user where Lodestar is installed** — don't regenerate one from memory (it'll be stale).
 2. **`.lode/verify.sh` skeleton**: copy from `~/.claude/lodestar/templates/verify.sh` (plugin install: `${CLAUDE_PLUGIN_ROOT}/docs/templates/verify.sh`), `chmod +x`. **Lay the skeleton now; the real commands are normally written by the first `lode-build`**.
-3. **`docs/` + `.lode/` directories + `.gitignore`**: create `docs/` (holds `spec.md`/`spec-changelog.md`) and `.lode/` (runtime artifacts); and ensure the project `.gitignore` **ignores `.lode/`** (runtime stays out of git) and **tracks `docs/spec*.md`**.
+3. **`docs/` + `.lode/` directories + `.gitignore`**: create `docs/` (holds `spec.md`/`spec-changelog.md`/`architecture.md`) and `.lode/` (runtime artifacts); and ensure the project `.gitignore` **ignores `.lode/`** (runtime stays out of git) and **tracks `docs/`** (`spec*.md` and `architecture.md` are both deliverables).
 
 > A script install (non-plugin) still needs the `hooks` block from `hooks/settings.json` merged into `.claude/settings.json` — that's not lode-init's job, see README. A plugin install already has the gate active.
 
@@ -27,7 +27,7 @@ Extension skill. Lays down the per-project files in one shot.
 
 - The project root has `CLAUDE.md` (created this run, or confirmed present with a merge note).
 - `.lode/verify.sh` exists and is executable.
-- Close with a one-line pointer: from scratch → next is `lode-spec`, changing existing code → next is still `lode-spec` (it gets system-map ready at the start).
+- Close with a one-line pointer: from scratch → next is `lode-spec`, changing existing code → next is still `lode-spec` (it gets architecture ready at the start).
 
 ## Guardrails (red lines)
 

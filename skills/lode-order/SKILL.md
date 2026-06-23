@@ -45,6 +45,7 @@ I'm setting this order on these assumptions; correct them now if wrong:
 - Done criteria can't be "close enough / looks fine"; not judgeable = no standard.
 - The order defines the finish line, not the implementation steps.
 - An order, once written, usually needs no second pass before you send it — unless the goal calls for something extra.
+- **An order is a fire-and-forget message, not persisted to disk**: its content is a re-rendering of that slice in the plan, and nothing downstream reads it; the trace of "what was issued / done" lives in `changelog.md` + `ledger.jsonl` + git — don't create a write-only archive nobody reads.
 
 ## → Next
 Send the order → the AI self-drives that slice; once it passes the four-step audit + gate, write the next one or hand off to `/lode-auto`.

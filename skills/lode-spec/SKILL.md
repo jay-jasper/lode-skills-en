@@ -1,6 +1,6 @@
 ---
 name: lode-spec
-description: "Lodestar mainline ① — requirements gathering. Pin down a fuzzy idea into a buildable spec. Use when the user is starting a new product/feature, changing or extending an existing project, gives only a one-line need or a vague idea, or needs requirements gathering — this is the unified requirements entry for both from scratch and changing existing code (changing existing code auto-fills system-map first, then runs as a delta). Blunt by default, no flattery, multiple-choice questioning. Trigger: /lode-spec"
+description: "Lodestar mainline ① — requirements gathering. Pin down a fuzzy idea into a buildable spec. Use when the user is starting a new product/feature, changing or extending an existing project, gives only a one-line need or a vague idea, or needs requirements gathering — this is the unified requirements entry for both from scratch and changing existing code (changing existing code auto-fills architecture first, then runs as a delta). Blunt by default, no flattery, multiple-choice questioning. Trigger: /lode-spec"
 ---
 
 # Product Spec Builder (Requirements Gathering)
@@ -18,26 +18,26 @@ Mainline step ①, and where the "blunt" persona is most concentrated. Through a
 On entering a project, **automatically** put what Lodestar's loop needs in place — don't make the user decide "when to install" anything:
 
 1. **Rules `CLAUDE.md`**: if the project root doesn't have it, **tell the user once, then drop a copy** — source: plugin install `${CLAUDE_PLUGIN_ROOT}/CLAUDE.md`, script install `~/.claude/lodestar/CLAUDE.md` (if neither is found, ask where Lodestar is installed). **If a `CLAUDE.md` already exists at the project root, never touch it** — it's likely the user's own project rules: don't overwrite, don't silently edit. Tell the user "you already have a CLAUDE.md," and only with their OK append Lodestar's rules in a `<!-- LODESTAR:BEGIN/END -->` block (removable as one block); without consent leave it as-is and let the skills + gate carry this session. **Note**: a project `CLAUDE.md` is usually loaded at session start, so one dropped mid-session takes full effect **next session**; this session's meta-rules are carried by the skill bodies + the gate — after dropping it, tell the user "rules are in place; fully active from your next session."
-2. **Current-state map `system-map.md`**: per the table below. (`verify.sh` is NOT provisioned here — `lode-build` writes it from the real build/test commands the moment development actually starts.)
-3. **Requirements doc `docs/spec.md`**: if one exists, **read it in and edit on top of it** (never rewrite wholesale); only create it when none exists. And ensure the project `.gitignore` **ignores `.lode/` and tracks `docs/spec*.md`** (the spec is a committed deliverable; `.lode/` is runtime, out of git).
+2. **Current-state map `architecture.md`**: per the table below. (`verify.sh` is NOT provisioned here — `lode-build` writes it from the real build/test commands the moment development actually starts.)
+3. **Requirements doc `docs/spec.md`**: if one exists, **read it in and edit on top of it** (never rewrite wholesale); only create it when none exists. And ensure the project `.gitignore` **ignores `.lode/` and tracks `docs/`** (`spec*.md` and `architecture.md` are both committed deliverables; `.lode/` is runtime, out of git).
 
 > All of this is **done automatically by the flow**, not a prerequisite command pushed on the user. To scaffold manually in one shot, the optional `/lode-init` exists (rarely needed).
 
-### How to get the current-state map ready (`system-map.md` is a living map every project should have)
+### How to get the current-state map ready (`architecture.md` is a living map every project should have)
 
-`system-map.md` isn't a "changing-existing-code only" output — it's a standing record of **what the system looks like right now**. Get it ready for the current situation (**the AI judges and does this itself; the user doesn't choose**):
+`architecture.md` isn't a "changing-existing-code only" output — it's a standing record of **what the system looks like right now**. Get it ready for the current situation (**the AI judges and does this itself; the user doesn't choose**):
 
 | Current situation (does the code you'll touch exist + is there this project's `.lode` history?) | How to get the map ready |
 |---|---|
 | **No code yet** (from scratch, first goal) | Start a minimal skeleton; current state = empty, the delta is just "from empty to X" |
-| **Code exists + this project built it** (has `.lode` history / last changelog) | Current state is known — read the existing `system-map.md` and refresh lightly, **no re-scan** |
-| **Code exists + foreign/legacy** (no `.lode` history) | Must read code to build the map: **small repo** → read it yourself; **large/unfamiliar** → **spawn the `lode-recon` subagent** (see `agents/lode-recon.md`) — a clean brain reads it and brings back only `system-map.md`, so a flood of code doesn't pollute this session's questioning context |
+| **Code exists + this project built it** (has `.lode` history / last changelog) | Current state is known — read the existing `architecture.md` and refresh lightly, **no re-scan** |
+| **Code exists + foreign/legacy** (no `.lode` history) | Must read code to build the map: **small repo** → read it yourself; **large/unfamiliar** → **spawn the `lode-recon` subagent** (see `agents/lode-recon.md`) — a clean brain reads it and brings back only `architecture.md`, so a flood of code doesn't pollute this session's questioning context |
 
 > The user only ever types one `/lode-spec`: how the map gets there is decided here. **A project isn't permanently "new" or "old"** — once the first goal ships and code exists, the next goal naturally lands in the "code exists" row; that slide is automatic, consistent with `/lode-auto`'s detection.
 
 ## How to ask (thin on steps, thick on standards)
 
-Don't write a "ask this first, ask that second" script. What you write thick is a **question bank** (lands at `.lode/question-bank-spec.md`; starter template in this skill's `references/question-bank-spec.md`): each question carries "what answer is acceptable / what answer must be pushed back." The model dynamically decides the next question from the user's answers; the question bank only yanks it back when it drifts. Delete the "how-to"; thicken the "what counts as good."
+Don't write a "ask this first, ask that second" script. What you write thick is a **question bank** (this skill's `references/question-bank-spec.md` — read and written in place; self-evolution only edits it here, no `.lode/` copy): each question carries "what answer is acceptable / what answer must be pushed back." The model dynamically decides the next question from the user's answers; the question bank only yanks it back when it drifts. Delete the "how-to"; thicken the "what counts as good."
 
 Four techniques (the key to questioning efficiently):
 
@@ -77,11 +77,11 @@ I'm reading it with these assumptions; interrupt me now if any are wrong:
 
 ## Changing existing code: use delta mode (when changing an existing project)
 
-When the goal lands in an existing project, the spec isn't "what to build" but **what to change**. The current state comes from the `system-map.md` filled at the start; write as a delta:
+When the goal lands in an existing project, the spec isn't "what to build" but **what to change**. The current state comes from the `architecture.md` filled at the start; write as a delta:
 - **Current**: what the behavior is now (for the part you're changing).
 - **Target**: what it should be after the change.
 - **Must never break (invariants / regression surface)**: which existing behaviors, data, and interfaces must stay unchanged — this column directly decides the characterization tests build must pin and the regression scope the gate must run.
-- **Affected modules**: mark from the system-map what will be rippled (for plan's impact analysis).
+- **Affected modules**: mark from the architecture what will be rippled (for plan's impact analysis).
 
 ## Done (what counts as acceptable)
 
@@ -97,7 +97,7 @@ Produce `docs/spec.md` that satisfies:
 
 - **No flattery.** AI naturally agrees with people — you feel flattered, the requirement is still mush. The rule is hard-coded here: blunt, press to the end, accept no vagueness.
 - Vague spots must be drilled into; nail a few key points per round; don't assume core decisions for the user.
-- **No map, no questioning** — if the code you'll change already exists but there's no `system-map.md`, get the map ready first (small repo: read it yourself; large: spawn the `lode-recon` subagent) before writing the delta; never fabricate the current state.
+- **No map, no questioning** — if the code you'll change already exists but there's no `architecture.md`, get the map ready first (small repo: read it yourself; large: spawn the `lode-recon` subagent) before writing the delta; never fabricate the current state.
 - Don't write the implementation plan, don't pick the tech stack (that's Planner/Builder's job).
 - When UI/layout is hard to put in words, align with a quick wireframe — **don't produce finished design in spec** (that belongs to brief/design).
 - Describe **capabilities**, don't shred the requirement into a pile of fragmented little tools.

@@ -1,6 +1,6 @@
 # Design Question Bank (Design) — starter template
 
-> Used by lode-brief. Lands at `.lode/question-bank-design.md`.
+> Used by lode-brief. Read and written in place (`skills/lode-brief/references/question-bank-design.md`) — self-evolution only edits it here, no `.lode/` copy.
 > Force "feel" into decisions: multiple-choice first, anti-reference mandatory, rejected → swap in a new batch.
 > Self-evolution only adds/changes/deletes here, each mapping to one real failure.
 

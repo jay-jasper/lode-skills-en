@@ -1,10 +1,10 @@
 # DEV PLAN — <project name>
 
-> Produced by lode-plan. Lands at `.lode/dev-plan.md`
+> Produced by lode-plan. Lands at `.lode/plan/<feature>-<YYYY-MM-DD_HH_MM_SS>.md` — **each replan saved as a new version, never overwritten**; downstream reads newest (`ls -t .lode/plan/*.md | head -1`).
 > Slice = an independent, acceptance-testable vertical slice: once done it compiles, runs, and can be accepted on its own.
 
 ## Mode
-- From scratch / changing existing code: <changing existing code needs a system-map.md first>
+- From scratch / changing existing code: <changing existing code needs a architecture.md first>
 - Solo / team: <team uses the PR/CI gate>
 
 ## Tech Selection & Key Decisions

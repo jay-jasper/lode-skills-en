@@ -43,14 +43,14 @@ Mainline (`①→⑥`):
 
 | # | Command (= skill name) | What it does | Output |
 |---|---|---|---|
-| 1 | `/lode-spec` | **Pin down** a fuzzy idea into a buildable requirement; at the start, get the current-state map ready (when changing existing code → delta = write only what changes) | `docs/spec.md` + `system-map.md` |
-| 2 | `/lode-brief` | Translate "feel" into concrete design decisions (optional) | `design-brief.md` |
+| 1 | `/lode-spec` | **Pin down** a fuzzy idea into a buildable requirement; at the start, get the current-state map ready (when changing existing code → delta = write only what changes) | `docs/spec.md` + `architecture.md` |
+| 2 | `/lode-brief` | Translate "feel" into concrete design decisions (optional) | `.lode/design/` |
 | 3 | `/lode-design` | Produce high-fidelity design / clickable prototype (optional) | `mockups/` |
-| 4 | `/lode-plan` | Split into slices (when changing existing code: impact analysis/migration/baseline) | `dev-plan.md` |
-| 5 | `/lode-build` | Build per the plan, running the four-step audit loop | code + `changelog.md` |
+| 4 | `/lode-plan` | Split into slices (when changing existing code: impact analysis/migration/baseline) | `.lode/plan/` |
+| 5 | `/lode-build` | Build per the plan, running the four-step audit loop | code + per-slice commit |
 | 6 | `/lode-release` | Privacy audit + package & release (team: PR/CI) | Release |
 
-> "Codebase recon" (reading existing code into `system-map.md`) is folded into `lode-spec`'s start — it's no longer a separate command; for a large/unfamiliar codebase, spec spawns the `lode-recon` **subagent** (see `agents/lode-recon.md`) to read it with a clean brain. `system-map.md` is a living map every project has, created by spec and kept current by build.
+> "Codebase recon" (reading existing code into `architecture.md`) is folded into `lode-spec`'s start — it's no longer a separate command; for a large/unfamiliar codebase, spec spawns the `lode-recon` **subagent** (see `agents/lode-recon.md`) to read it with a clean brain. `architecture.md` is a living map every project has, created by spec and kept current by build.
 
 Extensions (as needed):
 
@@ -107,7 +107,7 @@ Give one goal; it decides from-scratch/changing-existing-code and solo/team, spl
 ### Manual, step by step — when you want to drive each stage
 ```
 /lode-spec    # pin down requirements → docs/spec.md
-/lode-plan    # split into slices (each slice's acceptance scenarios first) → dev-plan.md
+/lode-plan    # split into slices (each slice's acceptance scenarios first) → .lode/plan/
 /lode-order   # write one slice's order, hand it to the AI → four-step audit loop
 ```
 - Want mockups? insert `/lode-brief` (+ optional `/lode-design`) before plan; finish with `/lode-release`.
@@ -125,21 +125,21 @@ Lodestar is **doc-driven** throughout — the AI carries context across stages t
 |---|---|---|
 | `spec.md` | The **one durable source of truth** for requirements: what we're actually building now. Evolves in place, archives old items, stays bounded | ✅ The one to read; when requirements change, edit here (or have the AI do it) |
 | `spec-changelog.md` | Requirements change log (one line each: date / what / why) | Read it to trace "how the requirement got to today" |
+| `architecture.md` | A **living map** of the code's current state (architecture / conventions / interfaces). Created by spec, updated by build each slice; persists across cycles | Read it to review / audit "what this codebase looks like" |
 
 **`.lode/` (runtime working drafts — gitignored by default, not committed)**
 
 | File | What it is | Do you touch it? |
 |---|---|---|
-| `system-map.md` | A **living map** of the code's current state (architecture / conventions / interfaces). Created by spec, updated by build each slice | Read it to quickly grasp "what this codebase looks like" |
-| `dev-plan.md` | The dev plan: slice breakdown + each slice's **acceptance scenarios** | Read it to see "how many slices, what each must satisfy" |
-| `changelog.md` | What each slice did (timestamped) | Read it to see "what changed this round" |
-| `design-brief.md` / `mockups/` | Design brief / prototype (only present if you used `/lode-brief`·`/lode-design`) | Read it when you care about the design direction |
+| `plan/<feature>-<date_time>.md` | The dev plan: slice breakdown + each slice's **acceptance scenarios**. Each replan saved as a new version, **never overwritten**; downstream reads newest | Read it to see "how many slices, what each must satisfy / how the plan changed" |
+| `changelog.md` | What each slice did — **non-git projects only** fallback; git projects record it in the per-slice commit | Non-git: read it for "what changed this round"; git: read `git log` |
+| `design/<feature>-<date_time>.md` / `mockups/` | Design brief / prototype (only present if you used `/lode-brief`·`/lode-design`). Each new direction saved new, never overwritten | Read it when you care about the design direction |
 | `verify.sh` | Wraps this project's "build + full test" into one command; **the wrap-up gate actually runs it** | Usually leave it alone; the gate prompts you if it isn't configured |
 | `goal.md` / `ledger.jsonl` | Autopilot's goal + progress ledger (resumable after a crash, auditable when done) | Read for progress / audit when using `/lode-auto` |
 | `signals.jsonl` / `proposals.md` | Self-evolution: your correction-signal queue + distilled rule proposals | Leave it; `/lode-evolve` digests it |
-| `review-passed` · `.verify-green` · `.gate-attempts` | Gate bookkeeping: review marker / verify cache / breaker counter | **Leave entirely alone** — the program generates and rewrites these |
+| `.building` · `review-passed` · `.verify-green` · `.gate-attempts` | Gate bookkeeping: arm marker / review marker / verify cache / breaker counter | **Leave entirely alone** — the program generates and rewrites these |
 
-> **The split principle**: `docs/spec*.md` is the **durable, git-tracked** source of truth; everything in `.lode/` is working state — consumed within a cycle (plan / changelog / design), regenerable (system-map / verify), or pure bookkeeping (ledger / signals / gate cache). `.gitignore` should ignore `.lode/` and track `docs/spec*.md` — `lode-spec` / `lode-init` wire this up at the start, so you don't set it by hand.
+> **The split principle**: `docs/` (`spec*.md` + `architecture.md`) are the **durable, git-tracked** deliverables — the requirements map and the code-state map, for review/audit and surviving across machines and teammates; everything in `.lode/` is working state — consumed within a cycle (plan / design / changelog-for-non-git), regenerable (verify), or pure bookkeeping (ledger / signals / `.building` / gate cache). `.gitignore` should ignore `.lode/` and track `docs/` — `lode-spec` / `lode-init` wire this up at the start, so you don't set it by hand.
 >
 > There's also a top-level `CLAUDE.md` at the project root (Lodestar's operating conventions, auto-provisioned) — it governs how the AI runs the loop; normally you don't touch it.
 
@@ -176,5 +176,5 @@ Building from scratch takes the leanest flow; only when you're changing existing
 | Independent subagents (review / recon / evolve) | `Agent` tool + subagent | `agents/lode-{review,recon,evolve}.md` |
 | Deterministic rules → gate | **Hooks** (plugin `hooks/hooks.json` / project `.claude/settings.json`) | `hooks/` |
 | Self-evolution (signals→proposals→rule base) | `CLAUDE.md` rule base + `lode-evolve` (auto-prompted at session start) | `CLAUDE.md` + `skills/lode-evolve` |
-| Doc-driven | deliverable docs + runtime | `docs/spec*` (git-tracked) + `.lode/` (gitignored: `system-map / design-brief / dev-plan / changelog …`) |
+| Doc-driven | deliverable docs + runtime | `docs/` (git-tracked: `spec* / architecture`) + `.lode/` (gitignored: `plan / design / verify.sh …`) |
 | order = goal+standards+acceptance+constraints+execution | structured order instruction | `skills/lode-order` |

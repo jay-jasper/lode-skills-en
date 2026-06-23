@@ -7,7 +7,7 @@
 One line: what must be achieved.
 
 ## Mode
-- From scratch / changing existing code: <changing existing code: system-map is ensured by spec at the start (large repo → recon subagent)>
+- From scratch / changing existing code: <changing existing code: architecture is ensured by spec at the start (large repo → recon subagent)>
 - Solo / team: <team uses the PR/CI gate>
 
 ## Done criteria (acceptance-testable, item by item)

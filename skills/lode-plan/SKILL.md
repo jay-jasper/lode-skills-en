@@ -11,13 +11,13 @@ Mainline step ④. Break `docs/spec.md` (and design artifacts) into a set of **s
 
 ## Usage (when to use)
 
-- `docs/spec.md` (optionally `design-brief.md` / `mockups/`) is confirmed, ready to start.
+- `docs/spec.md` (optionally the latest `.lode/design/` / `mockups/`) is confirmed, ready to start.
 - You need to turn "what to build" into "in what order, in how many slices."
 - Before entering `lode-build`, there must be a plan.
 
 ## Done (what counts as acceptable)
 
-Produce `.lode/dev-plan.md` (covering current-doc-status notes, tech-selection conclusions, slice planning with order/parallelizability tags, and any necessary database design and dev rules), satisfying:
+Produce the dev plan at `.lode/plan/<feature>-<YYYY-MM-DD_HH_MM_SS>.md` (**each replan writes a new file, never overwrites the old one**, preserving the plan's evolution history; timestamp to the second to avoid collisions. Read newest: `ls -t .lode/plan/*.md | head -1`), covering current-doc-status notes, tech-selection conclusions, slice planning with order/parallelizability tags, and any necessary database design and dev rules, satisfying:
 - Broken into an ordered slice list, each slice a runnable vertical slice.
 - **Each slice carries its own Goal**: objective / done criteria (program-judgeable) / acceptance method / **acceptance scenarios**.
 - **Acceptance scenarios must be defined before building** (spec-bound): derive a few concrete, executable scenarios ("given X, do Y, get Z") from the spec's acceptance criteria — they dictate **what the tests must test**. This binds tests to the **requirement**, not to weak tests the builder reverse-engineers after writing the code — closing the "green tests but wrong feature" gap.
@@ -29,7 +29,7 @@ Produce `.lode/dev-plan.md` (covering current-doc-status notes, tech-selection c
 
 ## Changing existing code extra (when changing an existing project, mandatory per change-slice)
 
-Reading `system-map.md` + the spec's delta, add to each change-slice:
+Reading `architecture.md` + the spec's delta, add to each change-slice:
 - **Blast radius**: which files/modules this slice touches and who calls it (determined via codegraph/call relations, not guesswork).
 - **Regression surface**: which existing behaviors it ripples into; the corresponding existing-test scope to run (feeds the full-regression gate).
 - **Baseline / pin behavior**: before touching anything, **actually run the existing tests and save a baseline**; for the area you're changing that has no tests, first add **characterization tests** to pin current behavior, then change.
@@ -40,7 +40,7 @@ Reading `system-map.md` + the spec's delta, add to each change-slice:
 
 - Don't shred into a pile of fragmented tool/function tasks — grant capability, give acceptance-testable slices, let the Builder organize the implementation itself.
 - Each slice's done criteria must be program-judgeable, not "close enough."
-- The plan serves the loop; don't aim to freeze it perfectly in one shot — allow coming back to adjust during Build.
+- The plan serves the loop; don't aim to freeze it perfectly in one shot — allow coming back to adjust during Build, where **adjusting = writing a new `.lode/plan/<feature>-<ts>.md`, not editing the old file**, so every replan leaves a trace.
 - If design prototype code already exists, the plan must explicitly **build directly on it and reuse the code**, not "for reference only" rewrite.
 - Get the user's sign-off on the plan before entering `lode-build`.
 

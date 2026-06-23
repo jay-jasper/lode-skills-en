@@ -26,7 +26,7 @@ Lean on a question bank (starter template in this skill's `references/question-b
 
 ## Done (what counts as acceptable)
 
-Produce `.lode/design-brief.md` that satisfies:
+Produce the design brief at `.lode/design/<feature>-<YYYY-MM-DD_HH_MM_SS>.md` (**each new direction writes a new file, never overwrites the old one**, preserving the design's evolution history; timestamp to the second to avoid collisions. Read newest: `ls -t .lode/design/*.md | head -1`) that satisfies:
 - A **clear design direction** chosen (editorial/magazine, neo-brutalism, glassmorphism, Swiss…), not empty phrases like "clean minimal."
 - Both **reference and anti-reference** written out (what we want + what we absolutely don't).
 - Actionable design tokens: palette (incl. semantic colors), type pairing, spacing/radius/shadow rhythm.
@@ -38,7 +38,7 @@ Produce `.lode/design-brief.md` that satisfies:
 
 - Refuse the template look: don't default to dark mode; no cookie-cutter card grid + centered headline + gradient blob.
 - Turn "feel" into judgeable conventions; leave no "use your judgment" gaps.
-- **A new direction supersedes the old in place**: when changing design direction, update `design-brief.md` in place to the current decisions — don't stack old versions; write decisions that affect requirements back into `docs/spec.md` + one line in `docs/spec-changelog.md`.
+- **A new direction is saved as a new version, never overwritten**: when changing design direction, **write a new `.lode/design/<feature>-<ts>.md`** (the current decisions stated in full, no stacking of old versions inside it); the old files stay as-is for the trace, and downstream always reads the newest. Write decisions that affect requirements back into `docs/spec.md` + one line in `docs/spec-changelog.md`.
 - Don't write code or generate full pages in this step (that's lode-design / lode-build).
 - Confirm the direction with the user before expanding.
 

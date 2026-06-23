@@ -1,7 +1,7 @@
-# system-map — <project name>
+# architecture — <project name>
 
-> Built by lode-spec at the start, kept current by lode-build (a living current-state map every project has). Lands at `.lode/system-map.md`
-> Purpose: let spec know the current state, let plan do impact analysis, let build's changes "look like the existing code."
+> Built by lode-spec at the start, kept current by lode-build (a living current-state map every project has). Lands at `docs/architecture.md` — a **git-tracked deliverable**: it persists across cycles, reaches teammates/CI without a re-recon, and is meant for developers to review the system's current state (unlike `.lode/` working drafts, it is NOT wiped after release).
+> Purpose: let spec know the current state, let plan do impact analysis, let build's changes "look like the existing code," and let a new teammate grasp the system at a glance.
 
 ## Architecture map
 - Stack / framework / version:
